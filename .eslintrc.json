@@ -54,7 +54,7 @@
     "no-var": "error",
     "no-with": "error",
     "no-useless-computed-key": "error",
-    "eslint-plugin-unicorn/filename-case": [
+    "unicorn/filename-case": [
       "error",
       {
         "cases": {
@@ -63,16 +63,16 @@
         }
       }
     ],
-    "eslint-plugin-unicorn/no-useless-undefined": [
+    "unicorn/no-useless-undefined": [
       "off",
       {
         "checkArguments": false,
         "checkArrowFunctionBody": false
       }
     ],
-    "eslint-plugin-unicorn/prefer-top-level-await": "off",
-    "eslint-plugin-unicorn/prefer-node-protocol": "off",
-    "eslint-plugin-unicorn/prefer-set-has": "off"
+    "unicorn/prefer-top-level-await": "off",
+    "unicorn/prefer-node-protocol": "off",
+    "unicorn/prefer-set-has": "off"
   },
   "ignorePatterns": [
     "node_modules",
