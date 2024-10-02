@@ -12,6 +12,9 @@ export default function Home() {
                 <ListItem>
                     <Link href="/clocks">Clocks</Link>
                 </ListItem>
+                <ListItem>
+                    <Link href="/cube">Cube</Link>
+                </ListItem>
             </List>
         </div>
     );

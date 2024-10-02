@@ -1,5 +1,5 @@
-import { Divider, Grid, Menu, MenuItem, TextField, useTheme } from "@mui/material";
-import { green, grey, red } from "@mui/material/colors";
+import { Dialog, Divider, Grid, Menu, MenuItem, Paper, TextField, useTheme } from "@mui/material";
+import { amber, blue, blueGrey, deepOrange, deepPurple, green, grey, indigo, orange, purple, red, yellow } from "@mui/material/colors";
 import { useState } from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import MoreTimeIcon from '@mui/icons-material/MoreTime';
@@ -15,13 +15,13 @@ export const clockOutline = <img src="https://raw.githubusercontent.com/amcilrai
             pointerEvents: 'none',
         }
     } />
-export const clockRadius = 80;
 export type clockType = { size: number, filled: number, title: string, uuid: string, color: string }
-export const Clock = ({ clock: { size, filled: f, title, ...clock }, setClock, deleteClock }: { clock: clockType, setClock: (arg: clockType) => void, deleteClock: () => void }) => {
+export const Clock = ({ clock: { size, filled: f, title, ...clock }, setClock, deleteClock, moveLeft }: { clock: clockType, setClock: (arg: clockType) => void, deleteClock: () => void, moveLeft:()=>void }) => {
     const filled = size > f ? f : size;
     const on = { value: 1, on: true };
     const off = { value: 1, on: false }
     const data01 = [...[...new Array(size - filled)].map(() => off), ...[...new Array(filled)].map(() => on)];
+    const [open, setOpen] = useState(false);
 
     const radRatio = .86
     const [contextMenu, setContextMenu] = useState<{
@@ -29,8 +29,15 @@ export const Clock = ({ clock: { size, filled: f, title, ...clock }, setClock, d
         mouseY: number;
     } | null>(null);
     const theme = useTheme();
-    return <Grid item style={{ width: clockRadius * 2 }} sx={{ margin: 1 }}>
-        <div style={{ height: clockRadius * 2, width: clockRadius * 2, position: "relative" }}
+    const clockE = (clockRadius = 80) => <Grid item style={{ width: clockRadius * 2 }} sx={{
+        margin: 1
+    }}>
+        <div style={{
+            height: clockRadius * 2,
+            width: clockRadius * 2,
+            position: "relative",
+            userSelect: "none"
+        }}
             onContextMenu={event => {
                 event.preventDefault();
                 setContextMenu(
@@ -46,21 +53,21 @@ export const Clock = ({ clock: { size, filled: f, title, ...clock }, setClock, d
                 );
             }}>
             <ResponsiveContainer width="100%" height="100%" style={{ transform: "rotate(-90deg)" }}  >
-                <PieChart width={100} height={100}
-
-                >
+                <PieChart width={100} height={100}>
                     <Pie data={data01} dataKey="value" cx="50%" cy="50%" outerRadius={radRatio * clockRadius} isAnimationActive={false}  >
                         {data01.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.on ? clock.color : "#0000"} stroke={grey[700]} strokeWidth={2} style={{ outline: 'none' }}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.bubbles = false;
-                                    setClock({
-                                        filled: size - index === filled ? size - index - 1 : size - index,
-                                        title,
-                                        size,
-                                        ...clock
-                                    });
+                                    open ?
+                                        setClock({
+                                            filled: size - index === filled ? size - index - 1 : size - index,
+                                            title,
+                                            size,
+                                            ...clock
+                                        }) :
+                                        setOpen(true);
                                 }}
                                 onDrag={e => console.log(e.movementX)}
 
@@ -91,9 +98,17 @@ export const Clock = ({ clock: { size, filled: f, title, ...clock }, setClock, d
                     ["Gray", grey[600]],
                     ["Red", red[600]],
                     ["Green", green[600]],
+                    ["Blue", blue[600]],
+                    ["Yellow", yellow[600]],
+                    ["Orange", orange[600]],
+                    ["Purple", purple[600]],
                 ] as const).map(([name, color]) =>
                     <MenuItem key={color} onClick={() => { setContextMenu(null); setClock({ title, size, filled, ...clock, color }) }} >{name}</MenuItem>)}
                 <Divider />
+                <MenuItem onClick={() => {
+                    moveLeft();
+                    setContextMenu(null);
+                }}>Move Left</MenuItem>
                 <MenuItem onClick={() => {
                     const yes = confirm("Are you sure you want to delete this clock?");
                     if (!yes) return;
@@ -103,9 +118,18 @@ export const Clock = ({ clock: { size, filled: f, title, ...clock }, setClock, d
             </Menu>
         </div>
 
-        <TextField value={title} placeholder={"My Clock"} variant="standard" onChange={(v) => {
+        <TextField value={title} multiline placeholder={"My Clock"} variant="standard" onChange={(v) => {
             v.preventDefault();
             setClock({ size, filled, title: v.target.value, ...clock })
         }} />
-    </Grid>
+
+    </Grid >;
+
+    return <><Dialog open={open} onClose={() => setOpen(false)} sx={{ transform: "scale(2.5)" }} >
+        <Paper
+            sx={{ padding: 1 }}
+        >
+            {clockE()}
+        </Paper>
+    </Dialog>{clockE()}</>
 }
