@@ -59,8 +59,9 @@ const rubik = () => {
         const y = (index + 2) % 3;
         const oldx = element.position[x];
         const oldy = element.position[y];
-        element.position[x] = oldy * (counterclockwise ? -1 : 1);
-        element.position[y] = oldx * (counterclockwise ? 1 : -1);
+        const oldPosition = [...element.position];
+        element.position[x] = oldy * (counterclockwise ? -1 : 1) * value;
+        element.position[y] = oldx * (counterclockwise ? 1 : -1) * value;
         const axis = [0, 0, 0] as [number, number, number];
         axis[index] = value * (counterclockwise ? Math.PI / 2 : -Math.PI / 2);
         const rot = new THREE.Quaternion().setFromEuler(
@@ -70,7 +71,7 @@ const rubik = () => {
           rot,
           element.rotation,
         );
-        console.log("Rotated", element, x, y, axis);
+        console.log("Rotated", oldPosition, element.position, x, y, axis);
       }
     }
     return { elements, rotate };
@@ -104,7 +105,7 @@ const PieceRender = ({ piece }: { piece: piece }) => {
     <mesh
       position={piece.position}
       ref={reference}
-      scale={clicked ? 1.5 : 0.98}
+      scale={0.98}
       onClick={() => click(!clicked)}
       onPointerOver={() => hover(true)}
       onPointerOut={() => hover(false)}
@@ -180,6 +181,26 @@ export default function Cube() {
             <Paper>{hash(cube.elements)}</Paper>
             <Paper>
               <ButtonGroup>
+                <Button onClick={() => setCube(cube.rotate(0, 1, false))}>
+                  R
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(0, -1, false))}>
+                  L
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(1, 1, false))}>
+                  U
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(1, -1, false))}>
+                  D
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(2, 1, false))}>
+                  F
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(2, -1, false))}>
+                  B
+                </Button>
+              </ButtonGroup>
+              <ButtonGroup>
                 <Button onClick={() => setCube(cube.rotate(0, 1, true))}>
                   R*
                 </Button>
@@ -188,6 +209,15 @@ export default function Cube() {
                 </Button>
                 <Button onClick={() => setCube(cube.rotate(1, 1, true))}>
                   U*
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(1, -1, true))}>
+                  D*
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(2, 1, true))}>
+                  F*
+                </Button>
+                <Button onClick={() => setCube(cube.rotate(2, -1, true))}>
+                  B*
                 </Button>
               </ButtonGroup>
             </Paper>
