@@ -41,7 +41,34 @@ const start: [number, number, number][] = ([[1], [0], [-1]] as const)
         [...v, -1],
       ] as const,
   );
+
+//TODO: Make this smaller bytes
+const hash = (cube: piece[]) => {
+  const size = (a: piece) =>
+    a.position[0] * 1 + a.position[1] * 10 + a.position[2] * 100;
+  const sorted = [...cube]
+    .filter((c) => c.position.filter((v) => v === 0).length < 2) //ignore centers for the hash
+    .sort((a, b) => size(a) - size(b));
+  return sorted
+    .map(
+      (v) =>
+        new THREE.Euler()
+          .setFromQuaternion(v.rotation)
+          .toArray()
+          .slice(0, 3)
+          .map((v) => Math.round((2 * (v as number)) / Math.PI) + 2)
+          .join("") +
+        ((v.position[0] + 1) * 1 +
+          (v.position[1] + 1) * 10 +
+          (v.position[2] + 1) * 100) +
+        ",",
+    )
+    .join("");
+};
+
+const memo: Record<string, [number, number, boolean][]> = {};
 const rubik = () => {
+  const rotations: Parameters<typeof rotate>[] = [];
   const elements: piece[] = start.map((v) => ({
     rotation: new THREE.Quaternion().identity(),
     originalPosition: [...v],
@@ -53,51 +80,32 @@ const rubik = () => {
     value: 1 | -1,
     counterclockwise: boolean,
   ) => {
+    const axis = [0, 0, 0] as [number, number, number];
+    axis[index] = value * (counterclockwise ? Math.PI / 2 : -Math.PI / 2);
+    const rot = new THREE.Quaternion().setFromEuler(new THREE.Euler(...axis));
+
     for (const element of elements) {
       if (element.position[index] === value) {
         const x = (index + 1) % 3;
         const y = (index + 2) % 3;
         const oldx = element.position[x];
         const oldy = element.position[y];
-        const oldPosition = [...element.position];
         element.position[x] = oldy * (counterclockwise ? -1 : 1) * value;
         element.position[y] = oldx * (counterclockwise ? 1 : -1) * value;
-        const axis = [0, 0, 0] as [number, number, number];
-        axis[index] = value * (counterclockwise ? Math.PI / 2 : -Math.PI / 2);
-        const rot = new THREE.Quaternion().setFromEuler(
-          new THREE.Euler(...axis),
-        );
         element.rotation = new THREE.Quaternion().multiplyQuaternions(
           rot,
           element.rotation,
         );
-        console.log("Rotated", oldPosition, element.position, x, y, axis);
       }
     }
-    return { elements, rotate };
+    rotations.push([index, value, counterclockwise]);
+    const key = hash(elements);
+    if (!(key in memo) || memo[key].length > rotations.length)
+      memo[key] = rotations;
+    return { elements, rotate, rotations };
   };
-  return { elements, rotate };
-};
-//TODO: Make this smaller bytes
-const hash = (cube: piece[]) => {
-  const size = (a: piece) =>
-    a.position[0] * 1 + a.position[1] * 10 + a.position[2] * 100;
-  const sorted = [...cube]
-    .filter((c) => c.position.filter((v) => v === 0).length < 2) //ignore centers for the hash
-    .sort((a, b) => size(a) - size(b));
-  return sorted.map(
-    (v) =>
-      new THREE.Euler()
-        .setFromQuaternion(v.rotation)
-        .toArray()
-        .slice(0, 3)
-        .map((v) => Math.round((2 * (v as number)) / Math.PI) + 2)
-        .join("") +
-      ((v.position[0] + 1) * 1 +
-        (v.position[1] + 1) * 10 +
-        (v.position[2] + 1) * 100) +
-      ",",
-  );
+  memo[hash(elements)] = [];
+  return { elements, rotate, rotations };
 };
 
 const PieceRender = ({ piece }: { piece: piece }) => {
@@ -185,6 +193,7 @@ export default function Cube() {
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Paper>{hash(cube.elements)}</Paper>
+            <Paper>{JSON.stringify(cube.rotations)}</Paper>
             <Paper>
               <ButtonGroup>
                 <Button onClick={() => setCube(cube.rotate(0, 1, false))}>
