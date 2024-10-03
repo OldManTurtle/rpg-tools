@@ -78,19 +78,25 @@ const rubik = () => {
   };
   return { elements, rotate };
 };
+//TODO: Make this smaller bytes
 const hash = (cube: piece[]) => {
   const size = (a: piece) =>
     a.position[0] * 1 + a.position[1] * 10 + a.position[2] * 100;
   const sorted = [...cube]
     .filter((c) => c.position.filter((v) => v === 0).length < 2) //ignore centers for the hash
     .sort((a, b) => size(a) - size(b));
-  return sorted.map((v) =>
-    new THREE.Euler()
-      .setFromQuaternion(v.rotation)
-      .toArray()
-      .slice(0, 3)
-      .map((v) => Math.round((2 * (v as number)) / Math.PI))
-      .join(""),
+  return sorted.map(
+    (v) =>
+      new THREE.Euler()
+        .setFromQuaternion(v.rotation)
+        .toArray()
+        .slice(0, 3)
+        .map((v) => Math.round((2 * (v as number)) / Math.PI) + 2)
+        .join("") +
+      ((v.position[0] + 1) * 1 +
+        (v.position[1] + 1) * 10 +
+        (v.position[2] + 1) * 100) +
+      ",",
   );
 };
 
