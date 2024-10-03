@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { List, ListItem } from "@mui/material";
+
 export default function Home() {
   return (
     <div>
@@ -15,6 +16,7 @@ export default function Home() {
           <Link href="/cube">Cube</Link>
         </ListItem>
       </List>
+      
     </div>
   );
 }
