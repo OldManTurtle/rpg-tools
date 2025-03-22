@@ -15,8 +15,10 @@ export default function Home() {
         <ListItem>
           <Link href="/cube">Cube</Link>
         </ListItem>
+        <ListItem>
+          <Link href="/cards">Cards</Link>
+        </ListItem>
       </List>
-      
     </div>
   );
 }
