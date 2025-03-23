@@ -5,9 +5,15 @@ import {
   Box,
   Toolbar,
   Grid2,
-  Stack,
   Slider,
   Button,
+  ButtonGroup,
+  Stack,
+  TextField,
+  AccordionActions,
+  Accordion,
+  AccordionSummary,
+  Typography,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -18,22 +24,115 @@ const assertUnreachable = (x: never): never => {
   throw new Error("Didn't expect to get here" + x);
 };
 
-type fieldType<T extends keyof React.JSX.IntrinsicElements> =
+type fieldElementType<T extends keyof React.JSX.IntrinsicElements> =
   React.JSX.IntrinsicElements[T] extends React.SVGProps<infer P>
     ? { type: `${T}`; props: React.SVGAttributes<P> }
     : never;
 
-type field = {
+type fieldType = {
   id: string;
-} & (fieldType<"ellipse"> | fieldType<"rect"> | fieldType<"image">);
+  title: string;
+} & (
+  | fieldElementType<"ellipse">
+  | fieldElementType<"rect">
+  | fieldElementType<"image">
+);
 
 type specType = {
   dimensions: [number, number];
-  fields: field[];
+  fields: fieldType[];
   cards: Record<
     string,
-    { value: string; overrides: Partial<field["props"]> }
+    { value: string; overrides: Partial<fieldType["props"]> }
   >[]; //ID/Value
+};
+
+const FieldEditor = ({
+  field,
+  setField,
+  spec,
+}: {
+  field: fieldType;
+  // eslint-disable-next-line no-unused-vars
+  setField: (t: fieldType) => void;
+  spec: specType;
+}) => {
+  const wrap = (stuff: (keyof fieldType["props"])[]) => (
+    <Grid2>
+      <Accordion>
+        <AccordionSummary>
+          <Typography component="span">
+            {field.title || "Untitled"} ({field.type})
+          </Typography>
+        </AccordionSummary>
+        <AccordionActions>
+          <Grid2 container spacing={1}>
+            <TextField
+              label={"Title"}
+              value={field.title}
+              onChange={(v) => {
+                setField({
+                  ...field,
+                  title: v.target.value,
+                });
+              }}
+            />
+            <ButtonGroup>
+              {(["ellipse", "rect", "image"] as const).map((type) => (
+                <Button
+                  key={type}
+                  onClick={() => setField({ ...field, type, props: {} })}
+                >
+                  {type}
+                </Button>
+              ))}
+            </ButtonGroup>
+            {stuff.map((key) => (
+              <Grid2 key={key}>
+                <TextField
+                  label={key}
+                  value={field.props[key]}
+                  id={key}
+                  onChange={(v) => {
+                    console.log(key, v.target.value);
+
+                    //@ts-expect-error This doesn't type nice
+                    setField({
+                      ...field,
+                      props: { ...field.props, [key]: v.target.value },
+                    });
+                  }}
+                />
+              </Grid2>
+            ))}
+          </Grid2>
+        </AccordionActions>
+      </Accordion>
+    </Grid2>
+  );
+  switch (field.type) {
+    case "ellipse": {
+      return wrap(["color", "cx", "cy", "rx", "ry"]);
+    }
+    case "rect": {
+      return wrap([
+        "width",
+        "height",
+        "x",
+        "y",
+        "fill",
+        "stroke",
+        "strokeWidth",
+      ]);
+    }
+    case "image": {
+      return wrap([]);
+    }
+    default: {
+      assertUnreachable(field);
+    }
+  }
+  return <div>How the hell did this render?</div>;
 };
 
 const EditorRender = ({
@@ -43,12 +142,36 @@ const EditorRender = ({
   spec: specType;
   setSpec: React.Dispatch<React.SetStateAction<specType>>;
 }) => {
+  const commonCards: Record<string, [number, number]> = {
+    Poker: [63, 88],
+    Bridge: [57, 88],
+    Mini: [44, 68],
+    "Large Tarot": [70, 120],
+    "Small Tarot": [70, 108],
+    "Large Square": [70, 70],
+    "Small Square": [63, 63],
+  };
   return (
-    <Grid2>
+    <Grid2 container spacing={1}>
+      <ButtonGroup>
+        {Object.entries(commonCards).map(([n, m]) => (
+          <Button
+            key={n}
+            onClick={() => setSpec({ ...spec, dimensions: m })}
+            variant={
+              spec.dimensions[0] === m[0] && spec.dimensions[1] === m[1]
+                ? "contained"
+                : undefined
+            }
+          >
+            {n}
+          </Button>
+        ))}
+      </ButtonGroup>
       <Slider
         min={1}
         step={1}
-        max={1000}
+        max={200}
         valueLabelDisplay="auto"
         value={spec.dimensions[0]}
         onChange={(v, t) =>
@@ -58,7 +181,7 @@ const EditorRender = ({
       />
       <Slider
         min={1}
-        max={1000}
+        max={200}
         step={0.1}
         valueLabelDisplay="auto"
         value={spec.dimensions[1]}
@@ -86,7 +209,17 @@ const EditorRender = ({
         Add Field
       </Button>
 
-      {JSON.stringify(spec, undefined, 2)}
+      {spec.fields.map((field, index) => (
+        <FieldEditor
+          setField={(n) => {
+            spec.fields[index] = n;
+            setSpec({ ...spec, fields: [...spec.fields] });
+          }}
+          field={field}
+          spec={spec}
+          key={field.id}
+        />
+      ))}
     </Grid2>
   );
 };
@@ -94,8 +227,8 @@ const EditorRender = ({
 const SvgRender = ({ spec }: { spec: specType }) => {
   return (
     <svg
-      width="100%"
-      height="200px"
+      width={Math.min(spec.dimensions[0] * 2, 300) * 2 + "px"}
+      height={Math.min(spec.dimensions[1] * 2, 300) * 2 + "px"}
       fill="currentColor"
       viewBox={`0 0 ${spec.dimensions[0]} ${spec.dimensions[1]}`}
     >
@@ -155,7 +288,7 @@ export default function Dashboard() {
         },
       },
       {
-        id: "1",
+        id: "2",
         type: "rect",
         props: {
           color: "green",
@@ -184,14 +317,14 @@ export default function Dashboard() {
       >
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Stack spacing={2}>
-            <Paper>
+          <Grid2 container spacing={2}>
+            <Grid2 component={Paper} size={{ xs: 6 }}>
               <SvgRender spec={spec} />
-            </Paper>
-            <Paper>
+            </Grid2>
+            <Grid2 component={Paper} size={{ xs: 6 }}>
               <EditorRender spec={spec} setSpec={setSpec} />
-            </Paper>
-          </Stack>
+            </Grid2>
+          </Grid2>
         </Container>
       </Box>
     </ThemeProvider>
