@@ -8,7 +8,6 @@ import {
   Slider,
   Button,
   ButtonGroup,
-  Stack,
   TextField,
   AccordionActions,
   Accordion,
@@ -19,6 +18,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "@/imports/theme";
 import { useState } from "react";
+import { array_move } from "@/imports/helpers";
 
 const assertUnreachable = (x: never): never => {
   throw new Error("Didn't expect to get here" + x);
@@ -50,64 +50,94 @@ type specType = {
 const FieldEditor = ({
   field,
   setField,
+  moveUp,
+  deleteThis,
   spec,
 }: {
+  moveUp: () => void;
   field: fieldType;
   // eslint-disable-next-line no-unused-vars
   setField: (t: fieldType) => void;
+  deleteThis: () => void;
   spec: specType;
 }) => {
   const wrap = (stuff: (keyof fieldType["props"])[]) => (
-    <Grid2>
-      <Accordion>
-        <AccordionSummary>
-          <Typography component="span">
-            {field.title || "Untitled"} ({field.type})
-          </Typography>
-        </AccordionSummary>
-        <AccordionActions>
-          <Grid2 container spacing={1}>
-            <TextField
-              label={"Title"}
-              value={field.title}
-              onChange={(v) => {
-                setField({
-                  ...field,
-                  title: v.target.value,
-                });
-              }}
-            />
-            <ButtonGroup>
-              {(["ellipse", "rect", "image"] as const).map((type) => (
-                <Button
-                  key={type}
-                  onClick={() => setField({ ...field, type, props: {} })}
-                >
-                  {type}
-                </Button>
-              ))}
-            </ButtonGroup>
-            {stuff.map((key) => (
-              <Grid2 key={key}>
-                <TextField
-                  label={key}
-                  value={field.props[key]}
-                  id={key}
-                  onChange={(v) => {
-                    console.log(key, v.target.value);
+    <Grid2 container>
+      <Grid2>
+        <Button
+          onClick={(event) => {
+            event.bubbles = false;
+            moveUp();
+          }}
+        >
+          Move Up
+        </Button>
+      </Grid2>
 
-                    //@ts-expect-error This doesn't type nice
-                    setField({
-                      ...field,
-                      props: { ...field.props, [key]: v.target.value },
-                    });
+      <Grid2 flex={1}>
+        <Accordion>
+          <AccordionSummary>
+            <Typography>
+              {field.title || "Untitled"} ({field.type})
+            </Typography>
+          </AccordionSummary>
+          <AccordionActions>
+            <Grid2 container spacing={1}>
+              <TextField
+                label={"Title"}
+                value={field.title}
+                onChange={(v) => {
+                  setField({
+                    ...field,
+                    title: v.target.value,
+                  });
+                }}
+              />
+              <ButtonGroup>
+                {(["ellipse", "rect", "image"] as const).map((type) => (
+                  <Button
+                    key={type}
+                    onClick={() => setField({ ...field, type, props: {} })}
+                    variant={type === field.type ? "contained" : undefined}
+                  >
+                    {type}
+                  </Button>
+                ))}
+              </ButtonGroup>
+              {stuff.map((key) => (
+                <Grid2 key={key}>
+                  <TextField
+                    label={key}
+                    value={field.props[key]}
+                    id={key}
+                    onChange={(v) => {
+                      console.log(key, v.target.value);
+
+                      //@ts-expect-error This doesn't type nice
+                      setField({
+                        ...field,
+                        props: { ...field.props, [key]: v.target.value },
+                      });
+                    }}
+                  />
+                </Grid2>
+              ))}
+              <Grid2 size={{ xs: 12 }}>
+                <Button
+                  onClick={(event) => {
+                    event.bubbles = false;
+                    deleteThis();
                   }}
-                />
+                  color="error"
+                  variant="contained"
+                >
+                  Delete
+                </Button>
               </Grid2>
-            ))}
-          </Grid2>
-        </AccordionActions>
-      </Accordion>
+            </Grid2>
+          </AccordionActions>
+        </Accordion>
+      </Grid2>
     </Grid2>
   );
   switch (field.type) {
@@ -200,6 +230,7 @@ const EditorRender = ({
               {
                 id: Math.floor(Math.random() * 10_000) + "",
                 type: "rect",
+                title: "",
                 props: {},
               },
             ],
@@ -208,7 +239,6 @@ const EditorRender = ({
       >
         Add Field
       </Button>
-
       {spec.fields.map((field, index) => (
         <FieldEditor
           setField={(n) => {
@@ -217,7 +247,22 @@ const EditorRender = ({
           }}
           field={field}
           spec={spec}
-          key={field.id}
+          key={field.id + index}
+          moveUp={() => {
+            if (index)
+              setSpec({
+                ...spec,
+                fields: array_move(spec.fields, index),
+              });
+          }}
+          deleteThis={function (): void {
+            const yes = confirm(
+              `Are you sure you want to delete ${field.title}? This cannot be undone.`,
+            );
+            if (!yes) return;
+            spec.fields.splice(index, 1);
+            setSpec({ ...spec, fields: [...spec.fields] });
+          }}
         />
       ))}
     </Grid2>
@@ -267,6 +312,7 @@ export default function Dashboard() {
     dimensions: [100, 100], //mm
     fields: [
       {
+        title: "Ellipse",
         id: "0",
         type: "ellipse",
         props: {
@@ -278,6 +324,7 @@ export default function Dashboard() {
         },
       },
       {
+        title: "Ellipse",
         id: "1",
         type: "rect",
         props: {
@@ -288,6 +335,7 @@ export default function Dashboard() {
         },
       },
       {
+        title: "Ellipse",
         id: "2",
         type: "rect",
         props: {
@@ -318,10 +366,14 @@ export default function Dashboard() {
         <Toolbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Grid2 container spacing={2}>
-            <Grid2 component={Paper} size={{ xs: 6 }}>
+            <Grid2 component={Paper}>
               <SvgRender spec={spec} />
             </Grid2>
-            <Grid2 component={Paper} size={{ xs: 6 }}>
+            <Grid2
+              component={Paper}
+              flex={1}
+              sx={{ overflowY: "auto", maxHeight: "80vh" }}
+            >
               <EditorRender spec={spec} setSpec={setSpec} />
             </Grid2>
           </Grid2>

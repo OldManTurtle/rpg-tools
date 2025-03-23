@@ -12,30 +12,7 @@ import { theme } from "@/imports/theme";
 import { useLocalStorage } from "usehooks-ts";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import { useEffect } from "react";
-
-const makeId = (length: number) => {
-  let result = "";
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-};
-
-const array_move = (array: unknown[], old_index: number, new_index: number) => {
-  if (new_index >= array.length) {
-    let k = new_index - array.length + 1;
-    while (k--) {
-      array.push(undefined);
-    }
-  }
-  array.splice(new_index, 0, array.splice(old_index, 1)[0]);
-  return array; // for testing
-};
+import { array_move, makeId } from "@/imports/helpers";
 
 const Clocks = () => {
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
@@ -61,9 +38,7 @@ const Clocks = () => {
             deleteClock={() =>
               setClocks((c) => c.filter((index_) => index_.uuid !== clock.uuid))
             }
-            moveLeft={() =>
-              setClocks((c) => index && array_move(c, index, index - 1))
-            }
+            moveLeft={() => setClocks((c) => index && array_move(c, index))}
           />
         ))}
         <Grid
@@ -81,7 +56,7 @@ const Clocks = () => {
                   filled: 0,
                   size: 4,
                   title: "",
-                  uuid: makeid(12),
+                  uuid: makeId(12),
                   color: theme.palette.grey[600],
                 },
               ])
