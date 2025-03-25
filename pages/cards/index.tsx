@@ -77,7 +77,7 @@ const FieldEditor = ({
       </Grid2>
 
       <Grid2 flex={1}>
-        <Accordion>
+        <Accordion elevation={3}>
           <AccordionSummary>
             <Typography>
               {field.title || "Untitled"} ({field.type})
@@ -149,7 +149,6 @@ const FieldEditor = ({
                             endAdornment={
                               <InputAdornment position="end">
                                 <PopoverPicker
-                                
                                   color={field.props[key] + ""}
                                   onChange={(v) => handleChange(v)}
                                 />
