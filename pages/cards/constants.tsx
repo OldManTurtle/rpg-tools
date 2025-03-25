@@ -14,11 +14,17 @@ export type fieldType = {
   | fieldElementType<"image">
 );
 
+export type cardType = {
+  title: string;
+  copies: number;
+  overrides: Record<
+    string, //FieldId
+    Partial<fieldType["props"]> //FieldOverrides
+  >;
+};
+
 export type specType = {
   dimensions: [number, number];
   fields: fieldType[];
-  cards: Record<
-    string,
-    { value: string; overrides: Partial<fieldType["props"]> }
-  >[]; //ID/Value
+  cards: cardType[];
 };
