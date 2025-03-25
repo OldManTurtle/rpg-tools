@@ -17,3 +17,7 @@ export const makeId = (length: number) => {
   }
   return result;
 };
+
+export const assertUnreachable = (x: never): never => {
+  throw new Error("Didn't expect to get here" + x);
+};

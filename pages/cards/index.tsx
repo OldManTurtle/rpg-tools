@@ -13,16 +13,18 @@ import {
   Accordion,
   AccordionSummary,
   Typography,
+  InputAdornment,
+  FilledInput,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { theme } from "@/imports/theme";
 import { useState } from "react";
-import { array_move } from "@/imports/helpers";
-
-const assertUnreachable = (x: never): never => {
-  throw new Error("Didn't expect to get here" + x);
-};
+import { array_move, assertUnreachable } from "@/imports/helpers";
+import { HexColorPicker } from "react-colorful";
+import { PopoverPicker } from "./PopoverPicker";
 
 type fieldElementType<T extends keyof React.JSX.IntrinsicElements> =
   React.JSX.IntrinsicElements[T] extends React.SVGProps<infer P>
@@ -52,16 +54,16 @@ const FieldEditor = ({
   setField,
   moveUp,
   deleteThis,
-  spec,
 }: {
   moveUp: () => void;
   field: fieldType;
   // eslint-disable-next-line no-unused-vars
   setField: (t: fieldType) => void;
   deleteThis: () => void;
-  spec: specType;
 }) => {
-  const wrap = (stuff: (keyof fieldType["props"])[]) => (
+  const wrap = (
+    stuff: Partial<Record<keyof fieldType["props"], "text" | "color">>,
+  ) => (
     <Grid2 container>
       <Grid2>
         <Button
@@ -104,24 +106,65 @@ const FieldEditor = ({
                   </Button>
                 ))}
               </ButtonGroup>
-              {stuff.map((key) => (
-                <Grid2 key={key}>
-                  <TextField
-                    label={key}
-                    value={field.props[key]}
-                    id={key}
-                    onChange={(v) => {
-                      console.log(key, v.target.value);
+              {Object.entries(stuff).map(([k, type]) => {
+                const key = k as keyof typeof stuff;
+                const handleChange = (
+                  v: (typeof field.props)[keyof typeof field.props],
+                ) =>
+                  //@ts-expect-error This doesn't type nice
+                  setField({
+                    ...field,
+                    props: { ...field.props, [key]: v },
+                  });
 
-                      //@ts-expect-error This doesn't type nice
-                      setField({
-                        ...field,
-                        props: { ...field.props, [key]: v.target.value },
-                      });
-                    }}
-                  />
-                </Grid2>
-              ))}
+                switch (type) {
+                  case "text": {
+                    return (
+                      <Grid2 key={key}>
+                        <TextField
+                          label={key}
+                          value={field.props[key]}
+                          id={key}
+                          onChange={(v) => {
+                            handleChange(v.target.value);
+                          }}
+                        />
+                      </Grid2>
+                    );
+                  }
+                  case "color": {
+                    return (
+                      <Grid2 key={key}>
+                        <FormControl
+                          sx={{ m: 1, width: "25ch" }}
+                          variant="filled"
+                        >
+                          <InputLabel htmlFor={key}>{key}</InputLabel>
+                          <FilledInput
+                            value={field.props[key]}
+                            id={key}
+                            onChange={(v) => {
+                              handleChange(v.target.value);
+                            }}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <PopoverPicker
+                                
+                                  color={field.props[key] + ""}
+                                  onChange={(v) => handleChange(v)}
+                                />
+                              </InputAdornment>
+                            }
+                          />
+                        </FormControl>
+                      </Grid2>
+                    );
+                  }
+                  default: {
+                    return assertUnreachable(type);
+                  }
+                }
+              })}
               <Grid2 size={{ xs: 12 }}>
                 <Button
                   onClick={(event) => {
@@ -142,21 +185,28 @@ const FieldEditor = ({
   );
   switch (field.type) {
     case "ellipse": {
-      return wrap(["color", "cx", "cy", "rx", "ry"]);
+      return wrap({
+        color: "color",
+        cx: "text",
+        cy: "text",
+        rx: "text",
+        ry: "text",
+      });
     }
     case "rect": {
-      return wrap([
-        "width",
-        "height",
-        "x",
-        "y",
-        "fill",
-        "stroke",
-        "strokeWidth",
-      ]);
+      return wrap({
+        color: "color",
+        width: "text",
+        height: "text",
+        x: "text",
+        y: "text",
+        fill: "text",
+        stroke: "text",
+        strokeWidth: "text",
+      });
     }
     case "image": {
-      return wrap([]);
+      return wrap({});
     }
     default: {
       assertUnreachable(field);
@@ -246,7 +296,6 @@ const EditorRender = ({
             setSpec({ ...spec, fields: [...spec.fields] });
           }}
           field={field}
-          spec={spec}
           key={field.id + index}
           moveUp={() => {
             if (index)
