@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import * as React from "react";
 import { useRef, useState } from "react";
-import { Canvas, MeshProps, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { GizmoHelper, GizmoViewport, OrbitControls } from "@react-three/drei";
 
 //Cube will be projected onto a unit sphere for ease of computation

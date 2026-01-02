@@ -207,13 +207,12 @@ export const FieldEditor = ({
     }
     case "rect": {
       return wrap({
-        color: "color",
         width: "text",
         height: "text",
         x: "text",
         y: "text",
-        fill: "text",
-        stroke: "text",
+        fill: "color",
+        stroke: "color",
         strokeWidth: "text",
       });
     }

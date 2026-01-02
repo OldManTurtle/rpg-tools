@@ -8,6 +8,7 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
+import React from "react";
 import {
   amber,
   blue,
@@ -18,6 +19,7 @@ import {
   grey,
   indigo,
   orange,
+  pink,
   purple,
   red,
   yellow,
@@ -53,11 +55,13 @@ export const Clock = ({
   setClock,
   deleteClock,
   moveLeft,
+  insertBefore,
 }: {
   clock: clockType;
   setClock: (argument: clockType) => void;
   deleteClock: () => void;
   moveLeft: () => void;
+  insertBefore: () => void;
 }) => {
   const filled = Math.min(size, f);
   const on = { value: 1, on: true };
@@ -178,6 +182,7 @@ export const Clock = ({
               ["Yellow", yellow[600]],
               ["Orange", orange[600]],
               ["Purple", purple[600]],
+              ["Pink", pink[600]],
             ] as const
           ).map(([name, color]) => (
             <MenuItem
@@ -198,6 +203,14 @@ export const Clock = ({
             }}
           >
             Move Left
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              insertBefore();
+              setContextMenu(null);
+            }}
+          >
+            Insert Left
           </MenuItem>
           <MenuItem
             onClick={() => {

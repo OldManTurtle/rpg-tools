@@ -13,10 +13,13 @@ export default function Home() {
           <Link href="/clocks">Clocks</Link>
         </ListItem>
         <ListItem>
-          <Link href="/cube">Cube</Link>
+          <Link href="/cube">Rubik&apos;s Cube</Link>
         </ListItem>
         <ListItem>
           <Link href="/cards">Cards</Link>
+        </ListItem>
+        <ListItem>
+          <Link href="/mtgcube">Mtg Cube</Link>
         </ListItem>
       </List>
     </div>

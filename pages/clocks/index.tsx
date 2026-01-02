@@ -24,6 +24,19 @@ const Clocks = () => {
     document.title = "Blades Clocks";
   }, []);
 
+  const insertClock = (index: number) =>
+    setClocks([
+      ...clocks.slice(0, index),
+      {
+        filled: 0,
+        size: 4,
+        title: "",
+        uuid: makeId(12),
+        color: theme.palette.grey[600],
+      },
+      ...clocks.slice(index),
+    ]);
+
   return (
     <Container>
       <Grid container>
@@ -39,6 +52,7 @@ const Clocks = () => {
               setClocks((c) => c.filter((index_) => index_.uuid !== clock.uuid))
             }
             moveLeft={() => setClocks((c) => index && array_move(c, index))}
+            insertBefore={() => insertClock(index)}
           />
         ))}
         <Grid
