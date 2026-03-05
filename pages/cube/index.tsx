@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import { theme } from "@/imports/theme";
+import { lightTheme } from "@/imports/theme";
 import { ThemeProvider } from "@emotion/react";
 import * as THREE from "three";
 import {
@@ -175,7 +175,7 @@ export default function Cube() {
     </>
   );
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={lightTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Box

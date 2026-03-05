@@ -21,7 +21,7 @@ import {
 import { useState } from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 // eslint-disable-next-line @next/next/no-img-element
-export const clockOutline = (
+export const clockOutline = (darkMode: boolean) => (
   // eslint-disable-next-line @next/next/no-img-element
   <img
     src="/clock_outline.png"
@@ -33,6 +33,7 @@ export const clockOutline = (
       top: 0,
       left: 0,
       pointerEvents: "none",
+      filter: darkMode ? "invert()" : undefined,
     }}
   />
 );
@@ -43,6 +44,7 @@ export type clockType = {
   title: string;
   uuid: string;
   color: string;
+  page?: number;
 };
 export const Clock = ({
   clock: { size, filled: f, title, ...clock },
@@ -50,8 +52,10 @@ export const Clock = ({
   deleteClock,
   moveLeft,
   insertBefore,
+  dark,
 }: {
   clock: clockType;
+  dark: boolean;
   setClock: (argument: clockType) => void;
   deleteClock: () => void;
   moveLeft: () => void;
@@ -122,8 +126,8 @@ export const Clock = ({
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.on ? clock.color : "#0000"}
-                  stroke={grey[700]}
-                  strokeWidth={2}
+                  stroke={dark ? clock.color : grey[700]}
+                  strokeWidth={dark ? 1 : 2}
                   style={{ outline: "none" }}
                   onClick={(event) => {
                     event.preventDefault();
@@ -146,7 +150,7 @@ export const Clock = ({
             </Pie>
           </PieChart>
         </ResponsiveContainer>
-        {clockOutline}
+        {clockOutline(dark)}
         <Menu
           open={!!contextMenu}
           onClose={() => setContextMenu(undefined)}

@@ -1,4 +1,12 @@
-import { Container, Paper } from "@mui/material";
+import {
+  Container,
+  Pagination,
+  Paper,
+  Grid,
+  Stack,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import { Clock, clockType } from "../../imports/clock";
 
 import * as React from "react";
@@ -7,14 +15,19 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid";
-import { theme } from "@/imports/theme";
+import { darkTheme, lightTheme } from "@/imports/theme";
 import { useLocalStorage } from "usehooks-ts";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import { useEffect } from "react";
 import { array_move, makeId } from "@/imports/helpers";
 
-const Clocks = () => {
+const Clocks = ({
+  dark,
+  setDark,
+}: {
+  dark: boolean;
+  setDark: (argument: boolean) => void;
+}) => {
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
     initializeWithValue: false,
   });
@@ -24,7 +37,7 @@ const Clocks = () => {
     document.title = "Blades Clocks";
   }, []);
 
-  const insertClock = (index: number) =>
+  const insertClock = (index: number, page: number) =>
     setClocks([
       ...clocks.slice(0, index),
       {
@@ -33,60 +46,86 @@ const Clocks = () => {
         title: "",
         uuid: makeId(12),
         color: theme.palette.grey[600],
+        page,
       },
       ...clocks.slice(index),
     ]);
+  const [currentPage, setCurrentPage] = React.useState(1);
 
   return (
-    <Container>
-      <Grid container>
-        {clocks.map((clock, index) => (
-          <Clock
-            key={clock.uuid}
-            clock={clock}
-            setClock={(newClock) => {
-              clocks[index] = newClock;
-              setClocks([...clocks]);
-            }}
-            deleteClock={() =>
-              setClocks((c) => c.filter((index_) => index_.uuid !== clock.uuid))
-            }
-            moveLeft={() => setClocks((c) => index && array_move(c, index))}
-            insertBefore={() => insertClock(index)}
-          />
-        ))}
-        <Grid
-          item
-          display="flex"
-          justifyContent={"center"}
-          alignItems={"flex-end"}
-        >
-          <IconButton
-            size={"large"}
-            onClick={() =>
-              setClocks([
-                ...clocks,
-                {
-                  filled: 0,
-                  size: 4,
-                  title: "",
-                  uuid: makeId(12),
-                  color: theme.palette.grey[600],
-                },
-              ])
-            }
-          >
-            <MoreTimeIcon />
-          </IconButton>
-        </Grid>
+    <Paper>
+      <Stack sx={{ position: "absolute", left: 0, top: 0 }}>
+        <Pagination
+          count={Math.max(...clocks.map((c) => c.page || 1)) + 1}
+          page={currentPage}
+          shape="rounded"
+          onChange={(_, newPage) => setCurrentPage(newPage)}
+        />
+        <FormControlLabel
+          control={<Switch checked={dark} onChange={() => setDark(!dark)} />}
+          label="Dark Mode"
+        />
+      </Stack>
+      <Grid container spacing={3}>
+        <Container>
+          <Grid container>
+            {clocks
+              .filter((c) => (c.page || 1) === currentPage)
+              .map((clock, index) => (
+                <Clock
+                  dark={dark}
+                  key={clock.uuid}
+                  clock={clock}
+                  setClock={(newClock) => {
+                    clocks[index] = newClock;
+                    setClocks([...clocks]);
+                  }}
+                  deleteClock={() =>
+                    setClocks((c) =>
+                      c.filter((index_) => index_.uuid !== clock.uuid),
+                    )
+                  }
+                  moveLeft={() =>
+                    index && setClocks((c) => array_move(c, index))
+                  }
+                  insertBefore={() => insertClock(index, currentPage)}
+                />
+              ))}
+            <Grid
+              item
+              display="flex"
+              justifyContent={"center"}
+              alignItems={"flex-end"}
+            >
+              <IconButton
+                size={"large"}
+                onClick={() =>
+                  setClocks([
+                    ...clocks,
+                    {
+                      filled: 0,
+                      size: 4,
+                      title: "",
+                      uuid: makeId(12),
+                      color: theme.palette.grey[600],
+                    },
+                  ])
+                }
+              >
+                <MoreTimeIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Container>
       </Grid>
-    </Container>
+    </Paper>
   );
 };
 
 export default function Dashboard() {
+  const [dark, setDark] = React.useState(true);
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={dark ? darkTheme : lightTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Box
@@ -103,11 +142,7 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Paper>
-              <Grid container spacing={3}>
-                <Clocks />
-              </Grid>
-            </Paper>
+            <Clocks dark={dark} setDark={setDark} />
           </Container>
         </Box>
       </Box>

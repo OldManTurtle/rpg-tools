@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import { theme } from "@/imports/theme";
+import { lightTheme } from "@/imports/theme";
 import { ThemeProvider } from "@emotion/react";
 import * as Icons from "@mui/icons-material";
 import {
@@ -82,7 +82,7 @@ export default function Cube() {
         .catch(() => setCards([]));
   }, [chosenSet]);
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={lightTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <Box

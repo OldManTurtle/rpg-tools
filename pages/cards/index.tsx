@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { theme } from "@/imports/theme";
+import { lightTheme } from "@/imports/theme";
 import { useState } from "react";
 import { specType } from "./constants";
 import { EditorRender } from "./EditorRender";
@@ -72,7 +72,7 @@ export default function Dashboard() {
   );
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={lightTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         {drawer}
