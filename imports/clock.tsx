@@ -30,7 +30,7 @@ import MoreTimeIcon from "@mui/icons-material/MoreTime";
 // eslint-disable-next-line @next/next/no-img-element
 export const clockOutline = (
   <img
-    src="https://raw.githubusercontent.com/amcilraithwustl/rpg-tools/main/public/clock_outline.png"
+    src="/clock_outline.png"
     alt="clock"
     style={{
       position: "absolute",

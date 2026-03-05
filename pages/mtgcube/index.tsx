@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { theme } from "@/imports/theme";
 import { ThemeProvider } from "@emotion/react";
+import * as Icons from "@mui/icons-material";
 import {
   Box,
   CssBaseline,
@@ -10,11 +11,59 @@ import {
   MenuItem,
   ImageList,
   ImageListItem,
+  IconButton,
+  Typography,
+  Stack,
 } from "@mui/material";
 import Image from "next/image";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import * as scryfall from "scryfall-api";
+
+
+const cardSizes = {}
+const CardDisplay = ({ card }: { card: scryfall.Card }) => {
+  const uri =
+    card.card_faces?.at(0)?.image_uris?.art_crop || card.image_uris?.art_crop;
+  return (
+    <Stack
+      style={{
+        border: "black solid 2px",
+        height: "100%",
+        background: "black",
+        color: "white",
+      }}
+    >
+      <Stack direction="row" width="100%" justifyContent={"space-between"}>
+        <Typography>{card.name}</Typography>
+        <IconButton color="error">
+          <Icons.Delete />
+        </IconButton>
+      </Stack>
+      <div
+        style={{
+          position: "relative",
+          height: "50%",
+          width: "100%",
+        }}
+      >
+        {uri && (
+          <Image
+            sizes="(max-width: 400px) 100vw, (max-width: 800px) 50vw, 33vw"
+            alt={card.name}
+            src={uri}
+            key={card.id}
+            fill={true}
+            style={{ objectFit: "contain", height: "100%", width: "100%" }}
+          />
+        )}
+      </div>
+      <Stack direction="row" width="100%" justifyContent={"space-between"}>
+        <Typography>${card.prices.usd}</Typography>
+      </Stack>
+    </Stack>
+  );
+};
 
 export default function Cube() {
   const [sets, setSets] = useState<scryfall.Set[] | undefined>(undefined);
@@ -83,19 +132,10 @@ export default function Cube() {
                   </MenuItem>
                 ))}
             </Select>
-            <ImageList variant="quilted" cols={6} rowHeight={200}>
-              {cards.map((c) => (
-                <ImageListItem key={c.id}>
-                  {c.image_uris && (
-                    <Image
-                      sizes="(max-width: 400px) 100vw, (max-width: 800px) 50vw, 33vw"
-                      alt={c.name}
-                      src={c.image_uris.normal || c.image_uris.small}
-                      key={c.id}
-                      fill={true}
-                      style={{ objectFit: "contain" }}
-                    />
-                  )}
+            <ImageList variant="quilted" cols={4} rowHeight={200}>
+              {cards.map((card) => (
+                <ImageListItem key={card.id}>
+                  <CardDisplay card={card} />
                 </ImageListItem>
               ))}
             </ImageList>
