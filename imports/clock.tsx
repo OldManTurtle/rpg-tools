@@ -6,18 +6,12 @@ import {
   MenuItem,
   Paper,
   TextField,
-  useTheme,
 } from "@mui/material";
 import React from "react";
 import {
-  amber,
   blue,
-  blueGrey,
-  deepOrange,
-  deepPurple,
   green,
   grey,
-  indigo,
   orange,
   pink,
   purple,
@@ -26,9 +20,9 @@ import {
 } from "@mui/material/colors";
 import { useState } from "react";
 import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import MoreTimeIcon from "@mui/icons-material/MoreTime";
 // eslint-disable-next-line @next/next/no-img-element
 export const clockOutline = (
+  // eslint-disable-next-line @next/next/no-img-element
   <img
     src="/clock_outline.png"
     alt="clock"
@@ -67,17 +61,19 @@ export const Clock = ({
   const on = { value: 1, on: true };
   const off = { value: 1, on: false };
   const data01 = [
-    ...[...new Array(size - filled)].map(() => off),
-    ...[...new Array(filled)].map(() => on),
+    ...Array.from({ length: size - filled }).map(() => off),
+    ...Array.from({ length: filled }).map(() => on),
   ];
   const [open, setOpen] = useState(false);
 
   const radRatio = 0.86;
-  const [contextMenu, setContextMenu] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-  const theme = useTheme();
+  const [contextMenu, setContextMenu] = useState<
+    | {
+        mouseX: number;
+        mouseY: number;
+      }
+    | undefined
+  >(undefined);
   const clockE = (clockRadius = 80) => (
     <Grid
       item
@@ -96,15 +92,15 @@ export const Clock = ({
         onContextMenu={(event) => {
           event.preventDefault();
           setContextMenu(
-            contextMenu === null
-              ? {
-                  mouseX: event.clientX + 2,
-                  mouseY: event.clientY - 6,
-                }
+            contextMenu
+              ? undefined
               : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
                 // Other native context menus might behave different.
                 // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-                null,
+                {
+                  mouseX: event.clientX + 2,
+                  mouseY: event.clientY - 6,
+                },
           );
         }}
       >
@@ -129,9 +125,9 @@ export const Clock = ({
                   stroke={grey[700]}
                   strokeWidth={2}
                   style={{ outline: "none" }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.bubbles = false;
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.bubbles = false;
                     open
                       ? setClock({
                           filled:
@@ -144,7 +140,7 @@ export const Clock = ({
                         })
                       : setOpen(true);
                   }}
-                  onDrag={(e) => console.log(e.movementX)}
+                  onDrag={(event) => console.log(event.movementX)}
                 />
               ))}
             </Pie>
@@ -152,11 +148,11 @@ export const Clock = ({
         </ResponsiveContainer>
         {clockOutline}
         <Menu
-          open={contextMenu !== null}
-          onClose={() => setContextMenu(null)}
+          open={!!contextMenu}
+          onClose={() => setContextMenu(undefined)}
           anchorReference="anchorPosition"
           anchorPosition={
-            contextMenu === null
+            contextMenu === undefined
               ? undefined
               : { top: contextMenu.mouseY, left: contextMenu.mouseX }
           }
@@ -166,7 +162,7 @@ export const Clock = ({
               key={n}
               onClick={() => {
                 setClock({ size: n, filled, title, ...clock });
-                setContextMenu(null);
+                setContextMenu(undefined);
               }}
             >
               {n}
@@ -188,7 +184,7 @@ export const Clock = ({
             <MenuItem
               key={color}
               onClick={() => {
-                setContextMenu(null);
+                setContextMenu(undefined);
                 setClock({ title, size, filled, ...clock, color });
               }}
             >
@@ -199,7 +195,7 @@ export const Clock = ({
           <MenuItem
             onClick={() => {
               moveLeft();
-              setContextMenu(null);
+              setContextMenu(undefined);
             }}
           >
             Move Left
@@ -207,7 +203,7 @@ export const Clock = ({
           <MenuItem
             onClick={() => {
               insertBefore();
-              setContextMenu(null);
+              setContextMenu(undefined);
             }}
           >
             Insert Left
@@ -219,7 +215,7 @@ export const Clock = ({
               );
               if (!yes) return;
               deleteClock();
-              setContextMenu(null);
+              setContextMenu(undefined);
             }}
           >
             Delete
