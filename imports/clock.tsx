@@ -126,7 +126,7 @@ export const Clock = ({
                 <Cell
                   key={`cell-${index}`}
                   fill={entry.on ? clock.color : "#0000"}
-                  stroke={dark ? clock.color : grey[700]}
+                  stroke={dark ? clock.color : clock.color}
                   strokeWidth={dark ? 1 : 2}
                   style={{ outline: "none" }}
                   onClick={(event) => {

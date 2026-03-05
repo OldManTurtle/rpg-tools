@@ -39,7 +39,7 @@ const Clocks = ({
 
   const insertClock = (index: number, page: number) =>
     setClocks([
-      ...clocks.slice(0, index),
+      ...clocks.filter((c) => (c.page || 0) === currentPage).slice(0, index),
       {
         filled: 0,
         size: 4,
@@ -48,12 +48,13 @@ const Clocks = ({
         color: theme.palette.grey[600],
         page,
       },
-      ...clocks.slice(index),
+      ...clocks.filter((c) => (c.page || 0) === currentPage).slice(index),
+      ...clocks.filter((c) => (c.page || 0) !== currentPage),
     ]);
   const [currentPage, setCurrentPage] = React.useState(1);
 
   return (
-    <Paper>
+    <Paper elevation={dark ? 0 : undefined}>
       <Stack sx={{ position: "absolute", left: 0, top: 0 }}>
         <Pagination
           count={Math.max(...clocks.map((c) => c.page || 1)) + 1}
@@ -70,25 +71,37 @@ const Clocks = ({
         <Container>
           <Grid container>
             {clocks
+              .map((c, index) => ({ ...c, index }))
               .filter((c) => (c.page || 1) === currentPage)
-              .map((clock, index) => (
+              .map((clock) => (
                 <Clock
                   dark={dark}
                   key={clock.uuid}
                   clock={clock}
                   setClock={(newClock) => {
-                    clocks[index] = newClock;
+                    clocks[clock.index] = newClock;
                     setClocks([...clocks]);
                   }}
                   deleteClock={() =>
                     setClocks((c) =>
-                      c.filter((index_) => index_.uuid !== clock.uuid),
+                      c.filter((otherClock) => otherClock.uuid !== clock.uuid),
                     )
                   }
-                  moveLeft={() =>
-                    index && setClocks((c) => array_move(c, index))
-                  }
-                  insertBefore={() => insertClock(index, currentPage)}
+                  moveLeft={() => {
+                    const bunchedClocks = [
+                      ...clocks.filter(
+                        (c) => (c.page || 0) === (clock.page || 0),
+                      ),
+                      ...clocks.filter(
+                        (c) => (c.page || 0) !== (clock.page || 0),
+                      ),
+                    ];
+                    const index = bunchedClocks.findIndex(
+                      (c) => c.uuid === clock.uuid,
+                    );
+                    return index && setClocks(array_move(bunchedClocks, index));
+                  }}
+                  insertBefore={() => insertClock(clock.index, currentPage)}
                 />
               ))}
             <Grid
@@ -107,6 +120,7 @@ const Clocks = ({
                       size: 4,
                       title: "",
                       uuid: makeId(12),
+                      page: currentPage,
                       color: theme.palette.grey[600],
                     },
                   ])
@@ -134,7 +148,7 @@ export default function Dashboard() {
             backgroundColor: (theme) =>
               theme.palette.mode === "light"
                 ? theme.palette.grey[100]
-                : theme.palette.grey[900],
+                : theme.palette.background.paper,
             flexGrow: 1,
             height: "100vh",
             overflow: "auto",
