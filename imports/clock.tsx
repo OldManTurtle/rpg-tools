@@ -1,4 +1,5 @@
 import {
+  Box,
   Dialog,
   Divider,
   Grid,
@@ -48,12 +49,14 @@ export type clockType = {
 };
 export const Clock = ({
   clock: { size, filled: f, title, ...clock },
+  innerRadius,
   setClock,
   deleteClock,
   moveLeft,
   insertBefore,
   dark,
 }: {
+  innerRadius: number;
   clock: clockType;
   dark: boolean;
   setClock: (argument: clockType) => void;
@@ -225,8 +228,25 @@ export const Clock = ({
             Delete
           </MenuItem>
         </Menu>
+        {innerRadius ? (
+          <Box
+            sx={{
+              pointerEvents: "none",
+              position: "absolute",
+              left: clockRadius * (1 - innerRadius),
+              top: clockRadius * (1 - innerRadius),
+              backgroundColor: (t) =>
+                size === filled ? clock.color : t.palette.background.paper,
+              borderRadius: clockRadius,
+              borderColor: () => clock.color,
+              borderStyle: "solid",
+              borderWidth: dark ? 2 : 2.5,
+              width: clockRadius * innerRadius * 2,
+              height: clockRadius * innerRadius * 2,
+            }}
+          />
+        ) : undefined}
       </div>
-
       <TextField
         value={title}
         multiline

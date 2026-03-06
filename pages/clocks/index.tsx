@@ -75,6 +75,7 @@ const Clocks = ({
               .filter((c) => (c.page || 1) === currentPage)
               .map((clock) => (
                 <Clock
+                  innerRadius={0}
                   dark={dark}
                   key={clock.uuid}
                   clock={clock}
