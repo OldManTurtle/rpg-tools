@@ -68,7 +68,7 @@ export const Clock = ({
   moveLeft: () => void;
   insertBefore: () => void;
 }) => {
-  const innerRadius = numbers ? 0.3 : 0;
+  const innerRadius = 0.3;
   const filled = Math.min(size, f);
   const data01 = useMemo(
     () => [
@@ -262,11 +262,9 @@ export const Clock = ({
                 alignItems: "center",
               }}
             >
-              {numbers ? (
-                <Typography fontSize={20}>
-                  {filled}/{size}
-                </Typography>
-              ) : undefined}
+              <Typography fontSize={20}>
+                {filled}/{size}
+              </Typography>
             </Box>
           </Zoom>
         </div>
