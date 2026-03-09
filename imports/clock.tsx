@@ -7,6 +7,7 @@ import {
   MenuItem,
   Paper,
   TextField,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import {
@@ -49,14 +50,14 @@ export type clockType = {
 };
 export const Clock = ({
   clock: { size, filled: f, title, ...clock },
-  innerRadius,
   setClock,
+  numbers,
   deleteClock,
   moveLeft,
   insertBefore,
   dark,
 }: {
-  innerRadius: number;
+  numbers: boolean;
   clock: clockType;
   dark: boolean;
   setClock: (argument: clockType) => void;
@@ -64,6 +65,7 @@ export const Clock = ({
   moveLeft: () => void;
   insertBefore: () => void;
 }) => {
+  const innerRadius = numbers ? 0.3 : 0;
   const filled = Math.min(size, f);
   const on = { value: 1, on: true };
   const off = { value: 1, on: false };
@@ -83,7 +85,6 @@ export const Clock = ({
   >(undefined);
   const clockE = (clockRadius = 80) => (
     <Grid
-      item
       style={{ width: clockRadius * 2 }}
       sx={{
         margin: 1,
@@ -228,23 +229,38 @@ export const Clock = ({
             Delete
           </MenuItem>
         </Menu>
-        {innerRadius ? (
+        {innerRadius || numbers ? (
           <Box
             sx={{
               pointerEvents: "none",
               position: "absolute",
-              left: clockRadius * (1 - innerRadius),
-              top: clockRadius * (1 - innerRadius),
+              left:
+                clockRadius * (1 - innerRadius) -
+                //borderWidth /2
+                (innerRadius ? (dark ? 2 : 2.5) : 0) / 2,
+              top:
+                clockRadius * (1 - innerRadius) -
+                //borderWidth /2
+                (innerRadius ? (dark ? 2 : 2.5) : 0) / 2,
               backgroundColor: (t) =>
                 size === filled ? clock.color : t.palette.background.paper,
               borderRadius: clockRadius,
               borderColor: () => clock.color,
-              borderStyle: "solid",
-              borderWidth: dark ? 2 : 2.5,
+              borderStyle: innerRadius ? "solid" : undefined,
+              borderWidth: innerRadius ? (dark ? 2 : 2.5) : undefined,
               width: clockRadius * innerRadius * 2,
               height: clockRadius * innerRadius * 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          />
+          >
+            {numbers ? (
+              <Typography fontSize={20}>
+                {filled}/{size}
+              </Typography>
+            ) : undefined}
+          </Box>
         ) : undefined}
       </div>
       <TextField

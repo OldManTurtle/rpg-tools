@@ -28,6 +28,7 @@ const Clocks = ({
   dark: boolean;
   setDark: (argument: boolean) => void;
 }) => {
+  const [numbers, setNumbers] = React.useState(false);
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
     initializeWithValue: false,
   });
@@ -66,6 +67,12 @@ const Clocks = ({
           control={<Switch checked={dark} onChange={() => setDark(!dark)} />}
           label="Dark Mode"
         />
+        <FormControlLabel
+          control={
+            <Switch checked={numbers} onChange={() => setNumbers(!numbers)} />
+          }
+          label="Numbers"
+        />
       </Stack>
       <Grid container spacing={3}>
         <Container>
@@ -75,7 +82,7 @@ const Clocks = ({
               .filter((c) => (c.page || 1) === currentPage)
               .map((clock) => (
                 <Clock
-                  innerRadius={0}
+                  numbers={numbers}
                   dark={dark}
                   key={clock.uuid}
                   clock={clock}
@@ -106,7 +113,6 @@ const Clocks = ({
                 />
               ))}
             <Grid
-              item
               display="flex"
               justifyContent={"center"}
               alignItems={"flex-end"}
