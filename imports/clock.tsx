@@ -8,8 +8,9 @@ import {
   Paper,
   TextField,
   Typography,
+  Zoom,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   blue,
   green,
@@ -48,6 +49,8 @@ export type clockType = {
   color: string;
   page?: number;
 };
+const on = { value: 1, on: true };
+const off = { value: 1, on: false };
 export const Clock = ({
   clock: { size, filled: f, title, ...clock },
   setClock,
@@ -67,12 +70,13 @@ export const Clock = ({
 }) => {
   const innerRadius = numbers ? 0.3 : 0;
   const filled = Math.min(size, f);
-  const on = { value: 1, on: true };
-  const off = { value: 1, on: false };
-  const data01 = [
-    ...Array.from({ length: size - filled }).map(() => off),
-    ...Array.from({ length: filled }).map(() => on),
-  ];
+  const data01 = useMemo(
+    () => [
+      ...Array.from({ length: size - filled }).map(() => off),
+      ...Array.from({ length: filled }).map(() => on),
+    ],
+    [filled, size],
+  );
   const [open, setOpen] = useState(false);
 
   const radRatio = 0.86;
@@ -83,197 +87,217 @@ export const Clock = ({
       }
     | undefined
   >(undefined);
-  const clockE = (clockRadius = 80) => (
-    <Grid
-      style={{ width: clockRadius * 2 }}
-      sx={{
-        margin: 1,
-      }}
-    >
-      <div
-        style={{
-          height: clockRadius * 2,
-          width: clockRadius * 2,
-          position: "relative",
-          userSelect: "none",
-        }}
-        onContextMenu={(event) => {
-          event.preventDefault();
-          setContextMenu(
-            contextMenu
-              ? undefined
-              : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-                // Other native context menus might behave different.
-                // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-                {
-                  mouseX: event.clientX + 2,
-                  mouseY: event.clientY - 6,
-                },
-          );
+  const clockRadius = 80;
+  const clockE = useMemo(
+    () => (
+      <Grid
+        style={{ width: clockRadius * 2 }}
+        sx={{
+          margin: 1,
         }}
       >
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-          style={{ transform: "rotate(-90deg)" }}
+        <div
+          style={{
+            height: clockRadius * 2,
+            width: clockRadius * 2,
+            position: "relative",
+            userSelect: "none",
+          }}
+          onContextMenu={(event) => {
+            event.preventDefault();
+            setContextMenu(
+              contextMenu
+                ? undefined
+                : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+                  // Other native context menus might behave different.
+                  // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+                  {
+                    mouseX: event.clientX + 2,
+                    mouseY: event.clientY - 6,
+                  },
+            );
+          }}
         >
-          <PieChart width={100} height={100}>
-            <Pie
-              data={data01}
-              dataKey="value"
-              cx="50%"
-              cy="50%"
-              outerRadius={radRatio * clockRadius}
-              isAnimationActive={false}
-            >
-              {data01.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.on ? clock.color : "#0000"}
-                  stroke={dark ? clock.color : clock.color}
-                  strokeWidth={dark ? 1 : 2}
-                  style={{ outline: "none" }}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.bubbles = false;
-                    open
-                      ? setClock({
-                          filled:
-                            size - index === filled
-                              ? size - index - 1
-                              : size - index,
-                          title,
-                          size,
-                          ...clock,
-                        })
-                      : setOpen(true);
-                  }}
-                  onDrag={(event) => console.log(event.movementX)}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        {clockOutline(dark)}
-        <Menu
-          open={!!contextMenu}
-          onClose={() => setContextMenu(undefined)}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            contextMenu === undefined
-              ? undefined
-              : { top: contextMenu.mouseY, left: contextMenu.mouseX }
-          }
-        >
-          {[3, 4, 6, 8, 12].map((n) => (
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            style={{ transform: "rotate(-90deg)" }}
+          >
+            <PieChart width={100} height={100}>
+              <Pie
+                data={data01}
+                dataKey="value"
+                cx="50%"
+                cy="50%"
+                outerRadius={radRatio * clockRadius}
+                isAnimationActive={false}
+              >
+                {data01.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.on ? clock.color : "#0000"}
+                    stroke={dark ? clock.color : clock.color}
+                    strokeWidth={dark ? 1 : 2}
+                    style={{ outline: "none" }}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.bubbles = false;
+                      open
+                        ? setClock({
+                            filled:
+                              size - index === filled
+                                ? size - index - 1
+                                : size - index,
+                            title,
+                            size,
+                            ...clock,
+                          })
+                        : setOpen(true);
+                    }}
+                    onDrag={(event) => console.log(event.movementX)}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          {clockOutline(dark)}
+          <Menu
+            open={!!contextMenu}
+            onClose={() => setContextMenu(undefined)}
+            anchorReference="anchorPosition"
+            anchorPosition={
+              contextMenu === undefined
+                ? undefined
+                : { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            }
+          >
+            {[3, 4, 6, 8, 12].map((n) => (
+              <MenuItem
+                key={n}
+                onClick={() => {
+                  setClock({ size: n, filled, title, ...clock });
+                  setContextMenu(undefined);
+                }}
+              >
+                {n}
+              </MenuItem>
+            ))}
+            <Divider />
+            {(
+              [
+                ["Gray", grey[600]],
+                ["Red", red[600]],
+                ["Green", green[600]],
+                ["Blue", blue[600]],
+                ["Yellow", yellow[600]],
+                ["Orange", orange[600]],
+                ["Purple", purple[600]],
+                ["Pink", pink[600]],
+              ] as const
+            ).map(([name, color]) => (
+              <MenuItem
+                key={color}
+                onClick={() => {
+                  setContextMenu(undefined);
+                  setClock({ title, size, filled, ...clock, color });
+                }}
+              >
+                {name}
+              </MenuItem>
+            ))}
+            <Divider />
             <MenuItem
-              key={n}
               onClick={() => {
-                setClock({ size: n, filled, title, ...clock });
+                moveLeft();
                 setContextMenu(undefined);
               }}
             >
-              {n}
+              Move Left
             </MenuItem>
-          ))}
-          <Divider />
-          {(
-            [
-              ["Gray", grey[600]],
-              ["Red", red[600]],
-              ["Green", green[600]],
-              ["Blue", blue[600]],
-              ["Yellow", yellow[600]],
-              ["Orange", orange[600]],
-              ["Purple", purple[600]],
-              ["Pink", pink[600]],
-            ] as const
-          ).map(([name, color]) => (
             <MenuItem
-              key={color}
               onClick={() => {
+                insertBefore();
                 setContextMenu(undefined);
-                setClock({ title, size, filled, ...clock, color });
               }}
             >
-              {name}
+              Insert Left
             </MenuItem>
-          ))}
-          <Divider />
-          <MenuItem
-            onClick={() => {
-              moveLeft();
-              setContextMenu(undefined);
-            }}
-          >
-            Move Left
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              insertBefore();
-              setContextMenu(undefined);
-            }}
-          >
-            Insert Left
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              const yes = confirm(
-                "Are you sure you want to delete this clock?",
-              );
-              if (!yes) return;
-              deleteClock();
-              setContextMenu(undefined);
-            }}
-          >
-            Delete
-          </MenuItem>
-        </Menu>
-        {innerRadius || numbers ? (
-          <Box
-            sx={{
-              pointerEvents: "none",
-              position: "absolute",
-              left:
-                clockRadius * (1 - innerRadius) -
-                //borderWidth /2
-                (innerRadius ? (dark ? 2 : 2.5) : 0) / 2,
-              top:
-                clockRadius * (1 - innerRadius) -
-                //borderWidth /2
-                (innerRadius ? (dark ? 2 : 2.5) : 0) / 2,
-              backgroundColor: (t) =>
-                size === filled ? clock.color : t.palette.background.paper,
-              borderRadius: clockRadius,
-              borderColor: () => clock.color,
-              borderStyle: innerRadius ? "solid" : undefined,
-              borderWidth: innerRadius ? (dark ? 2 : 2.5) : undefined,
-              width: clockRadius * innerRadius * 2,
-              height: clockRadius * innerRadius * 2,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {numbers ? (
-              <Typography fontSize={20}>
-                {filled}/{size}
-              </Typography>
-            ) : undefined}
-          </Box>
-        ) : undefined}
-      </div>
-      <TextField
-        value={title}
-        multiline
-        placeholder={"My Clock"}
-        variant="standard"
-        onChange={(v) => {
-          v.preventDefault();
-          setClock({ size, filled, title: v.target.value, ...clock });
-        }}
-      />
-    </Grid>
+            <MenuItem
+              onClick={() => {
+                const yes = confirm(
+                  "Are you sure you want to delete this clock?",
+                );
+                if (!yes) return;
+                deleteClock();
+                setContextMenu(undefined);
+              }}
+            >
+              Delete
+            </MenuItem>
+          </Menu>
+
+          <Zoom in={numbers}>
+            <Box
+              sx={{
+                pointerEvents: "none",
+                position: "absolute",
+                left:
+                  clockRadius * (1 - innerRadius) -
+                  //borderWidth /2
+                  (innerRadius ? (dark ? 2 : 2.5) : 0) / 2,
+                top:
+                  clockRadius * (1 - innerRadius) -
+                  //borderWidth /2
+                  (innerRadius ? (dark ? 2 : 2.5) : 0) / 2,
+                backgroundColor: (t) =>
+                  size === filled ? clock.color : t.palette.background.paper,
+                borderRadius: clockRadius,
+                borderColor: () => clock.color,
+                borderStyle: innerRadius ? "solid" : undefined,
+                borderWidth: innerRadius ? (dark ? 2 : 2.5) : undefined,
+                width: clockRadius * innerRadius * 2,
+                height: clockRadius * innerRadius * 2,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {numbers ? (
+                <Typography fontSize={20}>
+                  {filled}/{size}
+                </Typography>
+              ) : undefined}
+            </Box>
+          </Zoom>
+        </div>
+        <TextField
+          value={title}
+          multiline
+          placeholder={"My Clock"}
+          variant="standard"
+          onChange={(v) => {
+            v.preventDefault();
+            setClock({ size, filled, title: v.target.value, ...clock });
+          }}
+        />
+      </Grid>
+    ),
+    [
+      clock,
+      contextMenu,
+      dark,
+      data01,
+      deleteClock,
+      filled,
+      innerRadius,
+      insertBefore,
+      moveLeft,
+      numbers,
+      open,
+      setClock,
+      size,
+      title,
+    ],
   );
 
   return (
@@ -283,9 +307,9 @@ export const Clock = ({
         onClose={() => setOpen(false)}
         sx={{ transform: "scale(2.5)" }}
       >
-        <Paper sx={{ padding: 1 }}>{clockE()}</Paper>
+        <Paper sx={{ padding: 1 }}>{clockE}</Paper>
       </Dialog>
-      {clockE()}
+      {clockE}
     </>
   );
 };
