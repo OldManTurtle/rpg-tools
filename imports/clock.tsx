@@ -243,8 +243,7 @@ export const Clock = ({
                 position: "absolute",
                 left: clockRadius * (1 - innerRadius),
                 top: clockRadius * (1 - innerRadius),
-                backgroundColor: (t) =>
-                  size === filled ? clock.color : t.palette.background.paper,
+                backgroundColor: (t) => t.palette.background.default,
                 borderRadius: clockRadius,
                 borderColor: () => clock.color,
                 borderStyle: "solid",

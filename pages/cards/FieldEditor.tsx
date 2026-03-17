@@ -1,6 +1,6 @@
 import * as React from "react";
 import {
-  Grid2,
+  Grid as Grid2,
   Button,
   ButtonGroup,
   TextField,

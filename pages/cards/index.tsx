@@ -4,7 +4,7 @@ import {
   Paper,
   Box,
   Toolbar,
-  Grid2,
+  Grid as Grid2,
   Divider,
   Drawer,
   List,

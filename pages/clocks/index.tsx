@@ -1,11 +1,11 @@
 import {
   Container,
   Pagination,
-  Paper,
   Grid,
   Stack,
   Switch,
   FormControlLabel,
+  Button,
 } from "@mui/material";
 import { Clock, clockType } from "../../imports/clock";
 
@@ -20,6 +20,7 @@ import { useLocalStorage } from "usehooks-ts";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import { useEffect } from "react";
 import { array_move, makeId } from "@/imports/helpers";
+import { FactionList, factionType } from "@/imports/faction";
 
 const Clocks = ({
   dark,
@@ -32,6 +33,13 @@ const Clocks = ({
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
     initializeWithValue: false,
   });
+  const [factions, setFactions] = useLocalStorage<factionType[]>(
+    "factionData",
+    [],
+    {
+      initializeWithValue: false,
+    },
+  );
   // const [clocks, setClocks] = useState<clockType[]>([])
   const theme = useTheme();
   useEffect(() => {
@@ -55,7 +63,7 @@ const Clocks = ({
   const [currentPage, setCurrentPage] = React.useState(1);
 
   return (
-    <Paper elevation={dark ? 0 : undefined}>
+    <Box>
       <Stack sx={{ position: "absolute", left: 0, top: 0 }}>
         <Pagination
           count={Math.max(...clocks.map((c) => c.page || 1)) + 1}
@@ -75,6 +83,29 @@ const Clocks = ({
         />
       </Stack>
       <Grid container spacing={3}>
+        <Stack>
+          <FactionList
+            factions={factions
+              .map((f, index) => ({ ...f, index }))
+              .filter((f) => (f.page || 1) === currentPage)}
+          />
+
+          <Button
+            onClick={() =>
+              setFactions([
+                ...factions,
+                {
+                  status: 0,
+                  uuid: makeId(12),
+                  name: "My Faction",
+                  page: currentPage,
+                },
+              ])
+            }
+          >
+            Add Faction
+          </Button>
+        </Stack>
         <Container>
           <Grid container>
             {clocks
@@ -139,7 +170,7 @@ const Clocks = ({
           </Grid>
         </Container>
       </Grid>
-    </Paper>
+    </Box>
   );
 };
 
@@ -154,7 +185,7 @@ export default function Dashboard() {
           sx={{
             backgroundColor: (theme) =>
               theme.palette.mode === "light"
-                ? theme.palette.grey[100]
+                ? theme.palette.background.default
                 : theme.palette.background.paper,
             flexGrow: 1,
             height: "100vh",

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Grid2, Button, ButtonGroup, TextField } from "@mui/material";
+import { Grid as Grid2, Button, ButtonGroup, TextField } from "@mui/material";
 import { array_move } from "@/imports/helpers";
 import { specType } from "./constants";
 import { FieldEditor } from "./FieldEditor";
