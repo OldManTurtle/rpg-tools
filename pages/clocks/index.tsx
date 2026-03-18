@@ -61,7 +61,12 @@ const Clocks = ({
       ...clocks.filter((c) => (c.page || 0) !== currentPage),
     ]);
   const [currentPage, setCurrentPage] = React.useState(1);
-
+  const setFaction = (f: factionType) => {
+    const index = factions.findIndex((fa) => fa.uuid === f.uuid);
+    if (index === undefined) setFactions([...factions, f]);
+    factions[index] = f;
+    setFactions([...factions]);
+  };
   return (
     <Box>
       <Stack sx={{ position: "absolute", left: 0, top: 0 }}>
@@ -88,6 +93,25 @@ const Clocks = ({
             factions={factions
               .map((f, index) => ({ ...f, index }))
               .filter((f) => (f.page || 1) === currentPage)}
+            setFaction={setFaction}
+            setFactions={(ff) => {
+              const n = Object.entries(ff)
+                .flatMap(([status, uuids]) =>
+                  uuids.map((uuid) => [status, uuid]),
+                )
+                .map(([status, uuid]) => ({
+                  ...factions.find((f) => f.uuid === uuid),
+                  status: Number.parseInt(status),
+                }))
+                .filter((s): s is factionType => !!s);
+              setFactions([
+                ...factions.filter((fac) => fac.page !== currentPage),
+                ...n,
+              ]);
+            }}
+            deleteFaction={(uuid) => {
+              setFactions(factions.filter((d) => d.uuid !== uuid));
+            }}
           />
 
           <Button

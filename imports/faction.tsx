@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Divider, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import { useSortable } from "@dnd-kit/react/sortable";
+import { DragDropProvider, useDroppable } from "@dnd-kit/react";
+import { move } from "@dnd-kit/helpers";
+import { CollisionPriority } from "@dnd-kit/abstract";
 
 export type factionType = {
   status: number;
@@ -12,15 +15,20 @@ export type factionType = {
 const Faction = ({
   faction,
   setFaction,
+  deleteFaction,
   index,
 }: {
   faction: factionType;
   setFaction: (argument: factionType) => void;
+  deleteFaction: () => void;
   index: number;
 }) => {
   const { ref } = useSortable({
     id: faction.uuid,
     index,
+    type: "faction",
+    accept: "faction",
+    group: faction.status + "",
   });
   const [contextMenu, setContextMenu] = useState<
     | {
@@ -70,10 +78,12 @@ const Faction = ({
         <Divider />
         <MenuItem
           onClick={() => {
+            const d = prompt('Are you sure? Type "DELETE" to remove.');
+            if (d === "DELETE") deleteFaction();
             setContextMenu(undefined);
           }}
         >
-          Insert Left
+          Delete
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -90,24 +100,82 @@ const Faction = ({
   );
 };
 
-export const FactionList = ({ factions }: { factions: factionType[] }) => {
+const FactionStatusList = ({
+  status,
+  factions,
+  deleteFaction,
+  setFaction,
+}: {
+  status: string;
+  factions: factionType[];
+  setFaction: (argument: factionType) => void;
+  deleteFaction: (argument: string) => void;
+}) => {
+  const { ref } = useDroppable({
+    id: status,
+    type: "status",
+    collisionPriority: CollisionPriority.Low,
+    accept: "faction",
+  });
   return (
-    <Stack direction={"row"}>
-      {[-3, -2, -1, 0, 1, 2, 3].map((status) => (
-        <Stack key={status}>
-          <Typography minWidth={100}>{status}</Typography>
-          {factions
-            .filter((f) => f.status === status)
-            .map((f, index) => (
-              <Faction
-                setFaction={() => {}}
-                key={f.uuid}
-                faction={f}
-                index={index}
-              />
-            ))}
-        </Stack>
-      ))}
+    <Stack
+      key={status}
+      ref={ref}
+      sx={{ border: "1px red solid", minHeight: "100px" }}
+    >
+      <Typography minWidth={100}>{status}</Typography>
+      {factions
+        .filter((f) => f.status + "" === status)
+        .map((f, index) => (
+          <Faction
+            setFaction={setFaction}
+            key={f.uuid}
+            faction={f}
+            index={index}
+            deleteFaction={() => deleteFaction(f.uuid)}
+          />
+        ))}
     </Stack>
+  );
+};
+const statuses = [-3, -2, -1, 0, 1, 2, 3] as const;
+export const FactionList = ({
+  factions,
+  setFaction,
+  setFactions,
+  deleteFaction,
+}: {
+  factions: factionType[];
+  setFaction: (argument: factionType) => void;
+  setFactions: (argument: Record<string, string[]>) => void;
+  deleteFaction: (argument: string) => void;
+}) => {
+  const items = Object.fromEntries(
+    statuses.map((status) => [
+      status,
+      factions.filter((s) => s.status === status).map((s) => s.uuid),
+    ]),
+  ) as Record<(typeof statuses)[number], string[]>;
+  return (
+    <DragDropProvider
+      onDragEnd={(event) => {
+        event.nativeEvent?.preventDefault();
+        const index = move(items, event);
+        console.log("INDEX", index);
+        setFactions(index);
+      }}
+    >
+      <Stack direction={"row"}>
+        {statuses.map((status) => (
+          <FactionStatusList
+            key={status + ""}
+            factions={factions}
+            status={status + ""}
+            setFaction={setFaction}
+            deleteFaction={deleteFaction}
+          />
+        ))}
+      </Stack>
+    </DragDropProvider>
   );
 };
