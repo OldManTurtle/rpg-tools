@@ -288,6 +288,7 @@ export const Clock = ({
           position: "relative",
           userSelect: "none",
           height: 10,
+          paddingBottom: 15,
         }}
         onContextMenu={(event) => {
           event.preventDefault();
@@ -304,11 +305,38 @@ export const Clock = ({
           );
         }}
       >
-        <Stack direction="row" alignItems={"center"}>
+        <Stack
+          direction="row"
+          alignItems={"center"}
+          onClick={(event) => {
+            if (open) return;
+            event.preventDefault();
+            event.stopPropagation();
+            event.bubbles = false;
+            setOpen(true);
+          }}
+        >
           {data01
             .toReversed()
-            .map((data) => (
+            .map((data, index) => (
               <Box
+                onClick={(event) => {
+                  if (!open) return;
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.bubbles = false;
+                  console.log(
+                    index,
+                    filled,
+                    index + 1 === filled ? index : index + 1,
+                  );
+                  setClock({
+                    filled: index + 1 === filled ? index : index + 1,
+                    title,
+                    size,
+                    ...clock,
+                  });
+                }}
                 key={data.value}
                 sx={{
                   border: "2px solid",
@@ -325,7 +353,7 @@ export const Clock = ({
                 ? [element]
                 : [
                     <Box
-                      key={index}
+                      key={index + "SPACER"}
                       sx={{
                         border: "1px  solid",
                         borderColor: clock.color,
