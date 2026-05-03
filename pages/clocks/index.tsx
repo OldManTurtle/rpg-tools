@@ -16,11 +16,10 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import { darkTheme, lightTheme } from "@/imports/theme";
-import { useLocalStorage } from "usehooks-ts";
+import { useLocalStorage, useCopyToClipboard } from "usehooks-ts";
 import MoreTimeIcon from "@mui/icons-material/MoreTime";
 import { useEffect } from "react";
 import { array_move, makeId } from "@/imports/helpers";
-import { FactionList, factionType } from "@/imports/faction";
 
 const Clocks = ({
   dark,
@@ -30,16 +29,10 @@ const Clocks = ({
   setDark: (argument: boolean) => void;
 }) => {
   const [numbers, setNumbers] = React.useState(true);
+  const [lines, setLines] = React.useState(true);
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
     initializeWithValue: false,
   });
-  const [factions, setFactions] = useLocalStorage<factionType[]>(
-    "factionData",
-    [],
-    {
-      initializeWithValue: false,
-    },
-  );
   // const [clocks, setClocks] = useState<clockType[]>([])
   const theme = useTheme();
   useEffect(() => {
@@ -61,12 +54,7 @@ const Clocks = ({
       ...clocks.filter((c) => (c.page || 0) !== currentPage),
     ]);
   const [currentPage, setCurrentPage] = React.useState(1);
-  const setFaction = (f: factionType) => {
-    const index = factions.findIndex((fa) => fa.uuid === f.uuid);
-    if (index === undefined) setFactions([...factions, f]);
-    factions[index] = f;
-    setFactions([...factions]);
-  };
+  const [, copyToClipboard] = useCopyToClipboard();
   return (
     <Box>
       <Stack sx={{ position: "absolute", left: 0, top: 0 }}>
@@ -86,50 +74,21 @@ const Clocks = ({
           }
           label="Numbers"
         />
+        <FormControlLabel
+          control={<Switch checked={lines} onChange={() => setLines(!lines)} />}
+          label="Lines"
+        />
+        <Button
+          onClick={() => {
+            copyToClipboard(JSON.stringify(clocks));
+          }}
+          variant="contained"
+          sx={{ maxWidth: 100 }}
+        >
+          Copy Data to Clipboard
+        </Button>
       </Stack>
       <Grid container spacing={3}>
-        <Stack>
-          <FactionList
-            factions={factions
-              .map((f, index) => ({ ...f, index }))
-              .filter((f) => (f.page || 1) === currentPage)}
-            setFaction={setFaction}
-            setFactions={(ff) => {
-              const n = Object.entries(ff)
-                .flatMap(([status, uuids]) =>
-                  uuids.map((uuid) => [status, uuid]),
-                )
-                .map(([status, uuid]) => ({
-                  ...factions.find((f) => f.uuid === uuid),
-                  status: Number.parseInt(status),
-                }))
-                .filter((s): s is factionType => !!s);
-              setFactions([
-                ...factions.filter((fac) => fac.page !== currentPage),
-                ...n,
-              ]);
-            }}
-            deleteFaction={(uuid) => {
-              setFactions(factions.filter((d) => d.uuid !== uuid));
-            }}
-          />
-
-          <Button
-            onClick={() =>
-              setFactions([
-                ...factions,
-                {
-                  status: 0,
-                  uuid: makeId(12),
-                  name: "My Faction",
-                  page: currentPage,
-                },
-              ])
-            }
-          >
-            Add Faction
-          </Button>
-        </Stack>
         <Container>
           <Grid container>
             {clocks
@@ -138,6 +97,7 @@ const Clocks = ({
               .map((clock) => (
                 <Clock
                   numbers={numbers}
+                  lines={lines}
                   dark={dark}
                   key={clock.uuid}
                   clock={clock}
