@@ -396,22 +396,32 @@ export const Clock = ({
                   borderRadius: 100,
                   width: 15,
                   height: 15,
-                  backgroundColor: data.on ? clock.color : undefined,
+                  backgroundColor: undefined,
                 }}
               >
+                {data.on ? (
+                  <Box
+                    sx={{
+                      backgroundColor: clock.color,
+                      width: 2,
+                      marginLeft: 0.5,
+                      marginRight: 0.5,
+                      height: 13,
+                      transform: "rotate(45deg)translate(.2px, -1px)",
+                    }}
+                  />
+                ) : undefined}
                 {clock.burned && clock.burned > index ? (
                   <Box
                     sx={{
                       position: "absolute",
-                      border: "2px solid",
-                      borderColor: "black",
-                      width: 0,
-                      top: -2.8,
-                      left: 1,
+                      backgroundColor: clock.color,
+                      width: 2,
                       marginLeft: 0.5,
                       marginRight: 0.5,
-                      height: 17,
-                      transform: "rotate(45deg)",
+                      height: 13,
+                      top: 0,
+                      transform: "rotate(-45deg)translate(.8px, 0.5px)",
                     }}
                   />
                 ) : undefined}
