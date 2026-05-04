@@ -46,6 +46,8 @@ export type clockType = {
   size: number;
   filled: number;
   title: string;
+  burned?: number;
+  breaks?: number[];
   uuid: string;
   color: string;
   page?: number;
@@ -90,7 +92,129 @@ export const Clock = ({
       }
     | undefined
   >(undefined);
+  const [contextMenu2, setContextMenu2] = useState<
+    | {
+        mouseX: number;
+        mouseY: number;
+      }
+    | undefined
+  >(undefined);
   const clockRadius = 80;
+  const menu = (
+    <Menu
+      open={!!contextMenu}
+      onClose={() => setContextMenu(undefined)}
+      anchorReference="anchorPosition"
+      anchorPosition={
+        contextMenu === undefined
+          ? undefined
+          : { top: contextMenu.mouseY, left: contextMenu.mouseX }
+      }
+    >
+      <MenuItem
+        onClick={() => {
+          setContextMenu2(contextMenu);
+          setContextMenu(undefined);
+        }}
+      >
+        Other Menu
+      </MenuItem>
+      {[3, 4, 6, 8, 12].map((n) => (
+        <MenuItem
+          key={n}
+          onClick={() => {
+            setClock({ size: n, filled, title, ...clock });
+            setContextMenu(undefined);
+          }}
+        >
+          {n}
+        </MenuItem>
+      ))}
+      <Divider />
+      {(
+        [
+          ["Gray", grey[600]],
+          ["Red", red[600]],
+          ["Green", green[600]],
+          ["Blue", blue[600]],
+          ["Yellow", yellow[600]],
+          ["Orange", orange[600]],
+          ["Purple", purple[600]],
+          ["Pink", pink[600]],
+        ] as const
+      ).map(([name, color]) => (
+        <MenuItem
+          key={color}
+          onClick={() => {
+            setContextMenu(undefined);
+            setClock({ title, size, filled, ...clock, color });
+          }}
+        >
+          {name}
+        </MenuItem>
+      ))}
+      <Divider />
+      <MenuItem
+        onClick={() => {
+          moveLeft();
+          setContextMenu(undefined);
+        }}
+      >
+        Move Left
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          insertBefore();
+          setContextMenu(undefined);
+        }}
+      >
+        Insert Left
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          const yes = confirm("Are you sure you want to delete this clock?");
+          if (!yes) return;
+          deleteClock();
+          setContextMenu(undefined);
+        }}
+      >
+        Delete
+      </MenuItem>
+    </Menu>
+  );
+  const menu2 = (
+    <Menu
+      open={!!contextMenu2}
+      onClose={() => setContextMenu2(undefined)}
+      anchorReference="anchorPosition"
+      anchorPosition={
+        contextMenu2 === undefined
+          ? undefined
+          : { top: contextMenu2.mouseY, left: contextMenu2.mouseX }
+      }
+    >
+      {Array.from({ length: size + 1 })
+        .map((_, index) => index)
+        .filter((index) => index !== clock.burned)
+        .map((index) => (
+          <MenuItem
+            key={index + "b"}
+            onClick={() =>
+              setClock({
+                ...clock,
+                filled: f,
+                title,
+                size,
+                burned: index,
+              })
+            }
+          >
+            Burn {(clock.burned || 0) < index ? "+" : ""}
+            {index - (clock.burned || 0)}
+          </MenuItem>
+        ))}
+    </Menu>
+  );
   const roundClock = (
     <Grid
       style={{ width: clockRadius * 2 }}
@@ -163,81 +287,8 @@ export const Clock = ({
           </PieChart>
         </ResponsiveContainer>
         {clockOutline(dark)}
-        <Menu
-          open={!!contextMenu}
-          onClose={() => setContextMenu(undefined)}
-          anchorReference="anchorPosition"
-          anchorPosition={
-            contextMenu === undefined
-              ? undefined
-              : { top: contextMenu.mouseY, left: contextMenu.mouseX }
-          }
-        >
-          {[3, 4, 6, 8, 12].map((n) => (
-            <MenuItem
-              key={n}
-              onClick={() => {
-                setClock({ size: n, filled, title, ...clock });
-                setContextMenu(undefined);
-              }}
-            >
-              {n}
-            </MenuItem>
-          ))}
-          <Divider />
-          {(
-            [
-              ["Gray", grey[600]],
-              ["Red", red[600]],
-              ["Green", green[600]],
-              ["Blue", blue[600]],
-              ["Yellow", yellow[600]],
-              ["Orange", orange[600]],
-              ["Purple", purple[600]],
-              ["Pink", pink[600]],
-            ] as const
-          ).map(([name, color]) => (
-            <MenuItem
-              key={color}
-              onClick={() => {
-                setContextMenu(undefined);
-                setClock({ title, size, filled, ...clock, color });
-              }}
-            >
-              {name}
-            </MenuItem>
-          ))}
-          <Divider />
-          <MenuItem
-            onClick={() => {
-              moveLeft();
-              setContextMenu(undefined);
-            }}
-          >
-            Move Left
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              insertBefore();
-              setContextMenu(undefined);
-            }}
-          >
-            Insert Left
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              const yes = confirm(
-                "Are you sure you want to delete this clock?",
-              );
-              if (!yes) return;
-              deleteClock();
-              setContextMenu(undefined);
-            }}
-          >
-            Delete
-          </MenuItem>
-        </Menu>
-
+        {menu}
+        {menu2}
         <Zoom in={numbers}>
           <Box
             sx={{
@@ -339,6 +390,7 @@ export const Clock = ({
                 }}
                 key={data.value}
                 sx={{
+                  position: "relative",
                   border: "2px solid",
                   borderColor: clock.color,
                   borderRadius: 100,
@@ -346,7 +398,24 @@ export const Clock = ({
                   height: 15,
                   backgroundColor: data.on ? clock.color : undefined,
                 }}
-              />
+              >
+                {clock.burned && clock.burned > index ? (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      border: "2px solid",
+                      borderColor: "black",
+                      width: 0,
+                      top: -2.8,
+                      left: 1,
+                      marginLeft: 0.5,
+                      marginRight: 0.5,
+                      height: 17,
+                      transform: "rotate(45deg)",
+                    }}
+                  />
+                ) : undefined}
+              </Box>
             ))
             .flatMap((element, index) =>
               index === 0
@@ -367,6 +436,8 @@ export const Clock = ({
             )}
         </Stack>
       </div>
+      {menu}
+      {menu2}
       <TextField
         value={title}
         multiline
