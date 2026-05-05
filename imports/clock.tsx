@@ -215,6 +215,30 @@ export const Clock = ({
             {index - (clock.burned || 0)}
           </MenuItem>
         ))}
+      <Divider />
+      {Array.from({ length: size - 1 })
+        .map((_, index) => index)
+        .map((index) => (
+          <MenuItem
+            key={index + "break" + clock.breaks}
+            onClick={() =>
+              setClock({
+                ...clock,
+                filled: f,
+                title,
+                size,
+                breaks: clock.breaks?.includes(index)
+                  ? clock.breaks.filter((f) => f !== index)
+                  : clock.breaks
+                    ? [...clock.breaks, index]
+                    : [index],
+              })
+            }
+          >
+            Break {clock.breaks?.includes(index) ? "-" : "+"}
+            {index + 1}
+          </MenuItem>
+        ))}
     </Menu>
   );
   const roundClock = (
@@ -456,13 +480,25 @@ export const Clock = ({
                     <Box
                       key={index + "SPACER"}
                       sx={{
-                        border: "1px  solid",
-                        borderColor: clock.color,
-                        borderRadius: 0,
-                        width: 5,
-                        height: 0,
+                        backgroundColor: clock.color,
+                        height: 2,
+                        width: clock.breaks?.includes(index - 1) ? 18 : 5,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
-                    />,
+                    >
+                      {clock.breaks?.includes(index - 1) ? (
+                        <Box
+                          sx={{
+                            width: "2.4px",
+                            height: 15,
+                            borderRadius: 100,
+                            backgroundColor: clock.color,
+                          }}
+                        />
+                      ) : undefined}
+                    </Box>,
                     element,
                   ],
             )}
