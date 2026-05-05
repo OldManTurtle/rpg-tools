@@ -30,6 +30,7 @@ const Clocks = ({
 }) => {
   const [numbers, setNumbers] = React.useState(true);
   const [lines, setLines] = React.useState(true);
+  const [fillLines, setFillLines] = React.useState(true);
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
     initializeWithValue: false,
   });
@@ -78,6 +79,15 @@ const Clocks = ({
           control={<Switch checked={lines} onChange={() => setLines(!lines)} />}
           label="Lines"
         />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={fillLines}
+              onChange={() => setFillLines(!fillLines)}
+            />
+          }
+          label="Fill Lines"
+        />
         <Button
           onClick={() => {
             copyToClipboard(JSON.stringify(clocks));
@@ -125,6 +135,7 @@ const Clocks = ({
                     return index && setClocks(array_move(bunchedClocks, index));
                   }}
                   insertBefore={() => insertClock(clock.index, currentPage)}
+                  fillLines={fillLines}
                 />
               ))}
             <Grid

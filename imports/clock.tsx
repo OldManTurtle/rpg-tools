@@ -59,6 +59,7 @@ export const Clock = ({
   setClock,
   numbers,
   lines,
+  fillLines,
   deleteClock,
   moveLeft,
   insertBefore,
@@ -67,6 +68,7 @@ export const Clock = ({
   numbers: boolean;
   clock: clockType;
   dark: boolean;
+  fillLines: boolean;
   lines: boolean;
   setClock: (argument: clockType) => void;
   deleteClock: () => void;
@@ -396,10 +398,15 @@ export const Clock = ({
                   borderRadius: 100,
                   width: 15,
                   height: 15,
-                  backgroundColor: undefined,
+                  backgroundColor:
+                    fillLines && data.on ? clock.color : undefined,
                 }}
               >
-                {data.on ? (
+                {(!fillLines && data.on) ||
+                (fillLines &&
+                  clock.burned &&
+                  clock.burned > index &&
+                  !data.on) ? (
                   <Box
                     sx={{
                       backgroundColor: clock.color,
@@ -411,7 +418,22 @@ export const Clock = ({
                     }}
                   />
                 ) : undefined}
-                {clock.burned && clock.burned > index ? (
+                {fillLines &&
+                clock.burned &&
+                clock.burned > index &&
+                data.on ? (
+                  <Box
+                    sx={{
+                      backgroundColor: "black",
+                      width: 3,
+                      marginLeft: 0.5,
+                      marginRight: 0.5,
+                      height: 17,
+                      transform: "rotate(45deg)translate(-1.3px, -2px)",
+                    }}
+                  />
+                ) : undefined}
+                {!fillLines && clock.burned && clock.burned > index ? (
                   <Box
                     sx={{
                       position: "absolute",
