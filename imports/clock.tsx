@@ -355,9 +355,9 @@ export const Clock = ({
 
   const lineClock = (
     <Grid
+      size={{ lg: 3, md: 6, xs: 12 }}
       sx={{
-        margin: 1,
-        width: size * 30,
+        paddingTop: 2,
       }}
     >
       <div
@@ -448,12 +448,12 @@ export const Clock = ({
                 data.on ? (
                   <Box
                     sx={{
-                      backgroundColor: "black",
+                      backgroundColor: dark ? "black" : "white",
                       width: 3,
                       marginLeft: 0.5,
                       marginRight: 0.5,
                       height: 17,
-                      transform: "rotate(45deg)translate(-1.3px, -2px)",
+                      transform: "rotate(45deg)translate(-1.5px, -2px)",
                     }}
                   />
                 ) : undefined}

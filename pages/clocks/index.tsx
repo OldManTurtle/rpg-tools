@@ -29,7 +29,7 @@ const Clocks = ({
   setDark: (argument: boolean) => void;
 }) => {
   const [numbers, setNumbers] = React.useState(true);
-  const [lines, setLines] = React.useState(true);
+  const [lines, setLines] = React.useState(false);
   const [fillLines, setFillLines] = React.useState(true);
   const [clocks, setClocks] = useLocalStorage<clockType[]>("clockData", [], {
     initializeWithValue: false,
