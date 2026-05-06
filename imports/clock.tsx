@@ -355,16 +355,15 @@ export const Clock = ({
 
   const lineClock = (
     <Grid
-      size={{ lg: 3, md: 6, xs: 12 }}
+      size={{ lg: 3 }}
       sx={{
-        paddingTop: 2,
+        paddingTop: 4,
       }}
     >
       <div
         style={{
           position: "relative",
           userSelect: "none",
-          height: 10,
           paddingBottom: 15,
         }}
         onContextMenu={(event) => {
@@ -419,7 +418,8 @@ export const Clock = ({
                   position: "relative",
                   border: "2px solid",
                   borderColor: clock.color,
-                  borderRadius: 100,
+                  borderRadius: 15,
+                  boxSizing: "border-box",
                   width: 15,
                   height: 15,
                   backgroundColor:
@@ -433,6 +433,7 @@ export const Clock = ({
                   !data.on) ? (
                   <Box
                     sx={{
+                      position: "absolute",
                       backgroundColor: clock.color,
                       width: 2,
                       marginLeft: 0.5,
@@ -482,7 +483,7 @@ export const Clock = ({
                       sx={{
                         backgroundColor: clock.color,
                         height: 2,
-                        width: clock.breaks?.includes(index - 1) ? 18 : 5,
+                        width: clock.breaks?.includes(index - 1) ? 12 : 2.5,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
