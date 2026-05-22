@@ -1,10 +1,15 @@
-"use client";
-import { Button } from "@mui/material";
+"use server";
 import React from "react";
+import { Suspense } from "react";
+import { FileManager } from "./fetcher";
+import { getCurrentFile } from "../api/fileshare/route";
 
-// eslint-disable-next-line func-style
-function Signup() {
-  return <Button>MyButton</Button>;
-}
+const Signup = async () => {
+  return (
+    <Suspense fallback={"...Loading"}>
+      <FileManager currentFile={getCurrentFile()} />
+    </Suspense>
+  );
+};
 
 export default Signup;
