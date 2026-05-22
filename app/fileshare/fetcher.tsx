@@ -13,9 +13,12 @@ const handleFileDownload = async () => {
     console.log(fileUrl);
     if (!fileUrl) return;
     const link = document.createElement("a");
-    link.href = fileUrl;
+    // eslint-disable-next-line unicorn/prefer-global-this
+    link.href = window.URL.createObjectURL(fileUrl);
     link.download = (await getCurrentFileName()) || "file.txt";
     link.click();
+    // eslint-disable-next-line unicorn/prefer-global-this
+    window.URL.revokeObjectURL(link.href);
   } catch (error) {
     console.log("Error", error);
   }

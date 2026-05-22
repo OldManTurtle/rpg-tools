@@ -23,11 +23,6 @@ export const getCurrentFileName = async () => {
 
 export const downloadFileAction = async () => {
   console.log("downloadfileactions=>", thefile?.name);
-  const buffer = await thefile?.arrayBuffer();
-  if (!buffer) return;
-  // Convert to base64 to be serializable
-  const base64Data = btoa(String.fromCodePoint(...new Uint8Array(buffer)));
-  console.log("DATA", buffer, base64Data);
   // Return base64 to client
-  return `data:application/octet-stream;base64,${base64Data}`;
+  return thefile;
 };
