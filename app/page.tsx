@@ -16,10 +16,10 @@ export default function Home() {
           <Link href="/cube">Rubik&apos;s Cube</Link>
         </ListItem>
         <ListItem>
-          <Link href="/cards">Cards</Link>
+          <Link href="/mtgcube">Mtg Cube</Link>
         </ListItem>
         <ListItem>
-          <Link href="/mtgcube">Mtg Cube</Link>
+          <Link href="/fileshare">File Sharing</Link>
         </ListItem>
       </List>
     </div>

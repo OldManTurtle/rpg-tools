@@ -1,3 +1,4 @@
+"use client";
 import {
   Container,
   Pagination,
@@ -42,7 +43,7 @@ const Clocks = ({
 
   const insertClock = (index: number, page: number) =>
     setClocks([
-      ...clocks.filter((c) => (c.page || 0) === currentPage).slice(0, index),
+      ...clocks.slice(0, index),
       {
         filled: 0,
         size: 4,
@@ -51,8 +52,7 @@ const Clocks = ({
         color: theme.palette.grey[600],
         page,
       },
-      ...clocks.filter((c) => (c.page || 0) === currentPage).slice(index),
-      ...clocks.filter((c) => (c.page || 0) !== currentPage),
+      ...clocks.slice(index),
     ]);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [, copyToClipboard] = useCopyToClipboard();
