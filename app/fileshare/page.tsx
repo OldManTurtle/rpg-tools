@@ -2,12 +2,12 @@
 import React from "react";
 import { Suspense } from "react";
 import { FileManager } from "./fetcher";
-import { getCurrentFile } from "../api/fileshare/route";
+import { getCurrentFileName } from "../api/fileshare/actions";
 
 const Signup = async () => {
   return (
     <Suspense fallback={"...Loading"}>
-      <FileManager currentFile={getCurrentFile()} />
+      <FileManager currentFile={getCurrentFileName()} />
     </Suspense>
   );
 };

@@ -16,22 +16,18 @@ export const uploadFile = async (formData: FormData) => {
   console.log("SETBUFF", buff);
 };
 
-export const getCurrentFile = async () => {
+export const getCurrentFileName = async () => {
+  console.log("thefile", thefile?.name);
   return thefile?.name;
 };
 
-export const getAction = async () => {
-  console.log("REQ", buff?.byteLength, thefile?.name);
-  const response = new Response(buff);
-  return response;
-};
-
-export async function downloadFileAction() {
-  const buffer = thefile?.arrayBuffer();
-
+export const downloadFileAction = async () => {
+  console.log("downloadfileactions=>", thefile?.name);
+  const buffer = await thefile?.arrayBuffer();
+  if (!buffer) return;
   // Convert to base64 to be serializable
-  const base64Data = buffer?.toString();
-  console.log("DATA", base64Data);
+  const base64Data = btoa(String.fromCodePoint(...new Uint8Array(buffer)));
+  console.log("DATA", buffer, base64Data);
   // Return base64 to client
   return `data:application/octet-stream;base64,${base64Data}`;
-}
+};
