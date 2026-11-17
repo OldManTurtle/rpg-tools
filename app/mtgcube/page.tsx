@@ -1,3 +1,4 @@
+"use client";
 /* eslint-disable react/no-unknown-property */
 import { lightTheme } from "@/imports/theme";
 import { ThemeProvider } from "@emotion/react";
@@ -20,8 +21,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import * as scryfall from "scryfall-api";
 
-
-const cardSizes = {}
+const cardSizes = {};
 const CardDisplay = ({ card }: { card: scryfall.Card }) => {
   const uri =
     card.card_faces?.at(0)?.image_uris?.art_crop || card.image_uris?.art_crop;
