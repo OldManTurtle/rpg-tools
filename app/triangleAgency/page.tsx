@@ -406,10 +406,10 @@ export default function Dashboard() {
           }}
         >
           <Grid container>
-            <Grid size={{ xs: 12, lg: 6 }} sx={{ padding: 1 }}>
+            <Grid size={{ xs: 12, lg: 7, xl:6 }} sx={{ padding: 1 }}>
               <DiceRoller />
             </Grid>
-            <Grid size={{ xs: 12, lg: 6 }}>
+            <Grid size={{ xs: 12, lg: 5, xl:6 }}>
               <img
                 alt={"RULESREF"}
                 src={"/TARulesReference.jpg"}
