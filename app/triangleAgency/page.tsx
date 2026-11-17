@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import {
   Button,
@@ -16,6 +15,13 @@ import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import { Property } from "csstype";
+import Image from "next/image";
+import rulesReferenceJpg from "../../public/TARulesReference.jpg";
+import burnoutSvg from "../../public/burnout.svg";
+import successSvg from "../../public/ability - success.svg";
+import failureSvg from "../../public/ability - failure.svg";
+import chaosSvg from "../../public/chaos.svg";
+import triscendenceJpg from "../../public/triscendence.jpg";
 
 const taColors = {
   agencyRed: "#d10017",
@@ -241,8 +247,8 @@ const DiceRoller = () => {
           {burnout}
         </Typography>
 
-        <img
-          src={"/burnout.svg"}
+        <Image
+          src={burnoutSvg}
           alt={"burnout"}
           style={{
             width: 30,
@@ -304,9 +310,9 @@ const DiceRoller = () => {
   const results = (
     <Stack>
       <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-        <img
+        <Image
           alt={"success"}
-          src={success ? "/ability - success.svg" : "/ability - failure.svg"}
+          src={success ? successSvg : failureSvg}
           style={{ width: 40 }}
         />
         <Typography
@@ -333,8 +339,8 @@ const DiceRoller = () => {
           {chaos}
         </Typography>
 
-        <img
-          src={"/chaos.svg"}
+        <Image
+          src={chaosSvg}
           alt={"burnout"}
           style={{
             width: 30,
@@ -355,9 +361,9 @@ const DiceRoller = () => {
           </Typography>
         )}
         {triscendence && (
-          <img
+          <Image
             alt={"RULESREF"}
-            src={"/triscendence.jpg"}
+            src={triscendenceJpg}
             style={{
               objectFit: "contain",
               width: "500px",
@@ -409,9 +415,9 @@ export default function Dashboard() {
               <DiceRoller />
             </Grid>
             <Grid size={{ xs: 12, lg: 5, xl: 6 }}>
-              <img
+              <Image
                 alt={"RULESREF"}
-                src={"/TARulesReference.jpg"}
+                src={rulesReferenceJpg}
                 style={{ objectFit: "contain", width: "100%" }}
               />
             </Grid>
