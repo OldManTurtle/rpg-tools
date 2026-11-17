@@ -3,6 +3,7 @@
 import {
   Button,
   ButtonBase,
+  Divider,
   Grid,
   IconButton,
   Paper,
@@ -11,7 +12,7 @@ import {
 } from "@mui/material";
 import * as Icons from "@mui/icons-material";
 import * as React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { createTheme, ThemeProvider, useTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import { Property } from "csstype";
@@ -200,6 +201,8 @@ const DiceRoller = () => {
   const successes = dice.filter((f) => f === 3).length;
   const [burnout, setBurnout] = React.useState(0);
   const triscendence = successes === 3 && !modified && !rolling;
+  const t = useTheme();
+  const disabledOpacity = t.palette.action.disabledOpacity;
   const success = successes === 3 ? true : successes - burnout > 0;
   const chaos = Math.max(0, successes === 3 ? 0 : 6 - successes + burnout);
   const boZone = (
@@ -219,27 +222,35 @@ const DiceRoller = () => {
         }}
         spacing={1}
       >
-        <IconButton onClick={() => setBurnout((b) => b + 1)}>
-          <Icons.Add />
+        <IconButton
+          onClick={() => setBurnout((b) => Math.max(0, b - 1))}
+          color="primary"
+        >
+          <Icons.Remove />
         </IconButton>
 
         <Typography
           variant="h5"
           fontWeight={"bold"}
           sx={{
-            color: (t) =>
-              burnout === 0
-                ? t.palette.action.disabled
-                : t.palette.primary.main,
+            opacity: burnout === 0 ? disabledOpacity : undefined,
+            color: (t) => t.palette.primary.main,
             width: 15,
           }}
         >
           {burnout}
         </Typography>
 
-        <img src={"/burnout.svg"} alt={"burnout"} style={{ width: 30 }} />
-        <IconButton onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
-          <Icons.Remove />
+        <img
+          src={"/burnout.svg"}
+          alt={"burnout"}
+          style={{
+            width: 30,
+            opacity: burnout === 0 ? disabledOpacity : undefined,
+          }}
+        />
+        <IconButton onClick={() => setBurnout((b) => b + 1)} color="primary">
+          <Icons.Add />
         </IconButton>
       </Stack>
     </Stack>
@@ -292,6 +303,46 @@ const DiceRoller = () => {
   );
   const results = (
     <Stack>
+      
+      <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+        <img
+          alt={"success"}
+          src={success ? "/ability - success.svg" : "/ability - failure.svg"}
+          style={{ width: 40 }}
+        />
+        <Typography
+          variant={"h5"}
+          fontWeight={"bold"}
+          sx={{
+            color: (t) =>
+              success ? t.palette.info.main : t.palette.primary.main,
+            width: 15,
+          }}
+        >
+          {success ? "Success" : "Failure"}
+        </Typography>
+        <Box sx={{ flex: 1 }} />
+        <Typography
+          variant="h5"
+          fontWeight={"bold"}
+          sx={{
+            opacity: chaos === 0 ? disabledOpacity : undefined,
+            color: (t) => t.palette.info.main,
+            width: 15,
+          }}
+        >
+          {chaos}
+        </Typography>
+
+        <img
+          src={"/chaos.svg"}
+          alt={"burnout"}
+          style={{
+            width: 30,
+            opacity: chaos === 0 ? disabledOpacity : undefined,
+          }}
+        />
+      </Stack>
       <Stack alignItems={"center"}>
         {triscendence && (
           <Typography
@@ -316,23 +367,12 @@ const DiceRoller = () => {
           />
         )}
       </Stack>
-      <Stack direction="row" sx={{ alignItems: "center" }}>
-        <img
-          alt={"success"}
-          src={success ? "/ability - success.svg" : "/ability - failure.svg"}
-          style={{ width: 40 }}
-        />
-        {success ? "Success" : "Failure"}
-      </Stack>
-      <Stack direction="row" sx={{ alignItems: "center" }}>
-        <img alt={"success"} src={"/chaos.svg"} style={{ width: 40 }} />x{chaos}
-      </Stack>
     </Stack>
   );
   return (
     <Paper sx={{ padding: 1, height: "100%", width: "100%" }}>
       <Stack
-        spacing={1}
+        spacing={3}
         sx={{
           width: "100%",
           justifyContent: "space-between",
@@ -342,6 +382,7 @@ const DiceRoller = () => {
           {rollZone}
           {boZone}
         </Stack>
+        <Divider />
         {results}
       </Stack>
     </Paper>
