@@ -1,6 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { Button, ButtonBase, Grid, Paper, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonBase,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import * as React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -191,80 +198,89 @@ const DiceRoller = () => {
   const triscendence = successes === 3 && !modified && !rolling;
   const success = successes === 3 ? true : successes - burnout > 0;
   const chaos = Math.max(0, successes === 3 ? 0 : 6 - successes + burnout);
+  const bo = <img src={"/burnout.svg"} alt={"burnout"} style={{ width: 30 }} />;
   return (
-    <Paper>
-      <Button
-        disabled={rolling}
-        variant="contained"
-        onClick={() => {
-          setModified(false);
-          setDice(rawRollDice);
-          setRolling(true);
-          const intervals = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-            (v) => Math.exp(v / 3) * 60,
-          );
-          for (const index of intervals) {
-            setTimeout(() => setDice(rawRollDice()), index);
-          }
-          setTimeout(() => setRolling(false), intervals.at(-1));
-        }}
-      >
-        Roll!
-      </Button>
-      <Button onClick={() => setBurnout((b) => b + 1)}>+Burnout</Button>
-      <Button onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
-        -Burnout
-      </Button>
-      <Typography variant={"h5"} sx={{ color: "primary" }}>
-        <img src={"/burnout.svg"} alt={"burnout"} style={{ width: 30 }} />
-        {burnout}
-      </Typography>
-      <Grid container>
-        {dice.map((d, index) => (
-          <ButtonBase
-            key={Math.random()}
-            onClick={() => {
-              dice[index] = Math.max(1, (d + 1) % 5) as die;
-              setDice([...dice]);
-              setModified(true);
-            }}
-          >
-            <DieDisplay die={d}></DieDisplay>
-          </ButtonBase>
-        ))}
-      </Grid>
-      <Box>
-        {triscendence && (
-          <Typography
-            variant="h3"
-            sx={{ color: (t) => t.palette.primary.main, fontWeight: "bold" }}
-          >
-            Triscendence!
-          </Typography>
-        )}
-        {triscendence && (
+    <Paper sx={{ padding: 1, height: "100%", width: "100%" }}>
+      <Stack spacing={1}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", padding: 1 }}
+          spacing={1}
+        >
+          <Button onClick={() => setBurnout((b) => b + 1)}>+Burnout</Button>
+          <Button onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
+            -Burnout
+          </Button>
+          {burnout < 5 && Array.from({ length: burnout }).map(() => bo)}
+          {burnout >= 5 && bo}
+          {burnout >= 5 && <Typography>x{burnout}</Typography>}
+        </Stack>
+        <Button
+          disabled={rolling}
+          variant="contained"
+          onClick={() => {
+            setModified(false);
+            setDice(rawRollDice);
+            setRolling(true);
+            const intervals = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+              (v) => Math.exp(v / 3) * 60,
+            );
+            for (const index of intervals) {
+              setTimeout(() => setDice(rawRollDice()), index);
+            }
+            setTimeout(() => setRolling(false), intervals.at(-1));
+          }}
+        >
+          Roll!
+        </Button>
+        <Grid container justifyContent={"center"}>
+          {dice.map((d, index) => (
+            <ButtonBase
+              key={Math.random()}
+              onClick={() => {
+                dice[index] = Math.max(1, (d + 1) % 5) as die;
+                setDice([...dice]);
+                setModified(true);
+              }}
+            >
+              <DieDisplay die={d}></DieDisplay>
+            </ButtonBase>
+          ))}
+        </Grid>
+        <Box>
+          {triscendence && (
+            <Typography
+              variant="h3"
+              sx={{ color: (t) => t.palette.primary.main, fontWeight: "bold" }}
+            >
+              Triscendence!
+            </Typography>
+          )}
+          {triscendence && (
+            <img
+              alt={"RULESREF"}
+              src={"/triscendence.jpg"}
+              style={{
+                objectFit: "contain",
+                width: "500px",
+                mixBlendMode: "darken",
+              }}
+            />
+          )}
+        </Box>
+        <Stack direction="row" sx={{ alignItems: "center" }}>
           <img
-            alt={"RULESREF"}
-            src={"/triscendence.jpg"}
-            style={{
-              objectFit: "contain",
-              width: "500px",
-              mixBlendMode: "darken",
-            }}
+            alt={"success"}
+            src={success ? "/ability - success.svg" : "/ability - failure.svg"}
+            style={{ width: 40 }}
           />
-        )}
-      </Box>
-      <Box>
-        <img
-          alt={"success"}
-          src={success ? "/ability - success.svg" : "/ability - failure.svg"}
-          style={{ width: 40 }}
-        />
-        {success ? "Success" : "Failure"}
-      </Box>
-      <Box>
-        <img alt={"success"} src={"/chaos.svg"} style={{ width: 40 }} />x{chaos}
-      </Box>
+          {success ? "Success" : "Failure"}
+        </Stack>
+        <Stack direction="row" sx={{ alignItems: "center" }}>
+          <img alt={"success"} src={"/chaos.svg"} style={{ width: 40 }} />x
+          {chaos}
+        </Stack>
+      </Stack>
     </Paper>
   );
 };
@@ -286,7 +302,7 @@ export default function Dashboard() {
           }}
         >
           <Grid container>
-            <Grid size={{ xs: 12, lg: 6 }}>
+            <Grid size={{ xs: 12, lg: 6 }} sx={{ padding: 1 }}>
               <DiceRoller />
             </Grid>
             <Grid size={{ xs: 12, lg: 6 }}>
