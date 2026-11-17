@@ -1,5 +1,5 @@
 "use client";
-import { Button, Container, Typography } from "@mui/material";
+import { Button, Container, Paper, Typography } from "@mui/material";
 
 import * as React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -12,20 +12,94 @@ const taColors = {
   agencyInk: "#10045a",
   agencyGray: "#eaebf4",
   realityYellow: "#f0ab00",
-  anomalyBlue: "00047bb",
+  anomalyBlue: "#0047bb",
 };
 
 export const triangleTheme = createTheme({
-  palette: { mode: "light" },
-  typography: {
-    fontFamily: [
-      //Imported in globals.css
-      "'Alegreya SC'",
-      "sans-serif",
-    ].join(","),
+  palette: {
+    primary: {
+      main: taColors.agencyRed,
+    },
+    mode: "light",
+    secondary: {
+      main: taColors.realityYellow,
+    },
+    text: {
+      primary: taColors.agencyInk,
+    },
+    info: {
+      main: taColors.anomalyBlue,
+    },
+    background: {
+      paper: taColors.agencyGray,
+    },
   },
+  typography: {
+    fontFamily: "Poppins",
+    h1: {
+      fontFamily: "Poppins",
+      fontWeight: "bold",
+      color: taColors.agencyRed,
+    },
+    h2: {
+      fontFamily: "Poppins",
+    },
+  },
+  shape: {
+    borderRadius: 19,
+  },
+
+  shadows: [
+    "none",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ],
 });
 
+type die = 1 | 2 | 3 | 4;
+type dice = [die, die, die, die, die, die];
+const rawRollDie = () => (Math.floor(Math.random() * 4) + 1) as die;
+const rawRollDice = () =>
+  [
+    rawRollDie(),
+    rawRollDie(),
+    rawRollDie(),
+    rawRollDie(),
+    rawRollDie(),
+    rawRollDie(),
+  ] as dice;
+
+const DiceRoller = () => {
+  const [dice, setDice] = React.useState(rawRollDice());
+  return (
+    <Paper>
+      <Button onClick={() => setDice(rawRollDice)}>Roll!</Button>
+      {dice}
+    </Paper>
+  );
+};
 export default function Dashboard() {
   return (
     <ThemeProvider theme={triangleTheme}>
@@ -45,8 +119,11 @@ export default function Dashboard() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Typography>SOME TEXT HERE!</Typography>
-            <Button>PRIMAY</Button>
+            <Typography variant="h1">Triangle Agency</Typography>
+            <Button variant="contained" color="primary">
+              PRIMARY
+            </Button>
+            <DiceRoller />
           </Container>
         </Box>
       </Box>
