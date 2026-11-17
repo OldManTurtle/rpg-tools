@@ -1,5 +1,5 @@
 "use client";
-import { Button, Container, Paper, Typography } from "@mui/material";
+import { Button, Container, Grid, Paper, Typography } from "@mui/material";
 
 import * as React from "react";
 import {
@@ -8,6 +8,7 @@ import {
   Theme,
   ThemeProvider,
 } from "@mui/material/styles";
+import Image from "next/image";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -130,7 +131,7 @@ const Triangle = ({
             `${(size / 2) * Math.sqrt(3)}px solid ` + (borderColor ?? color),
         }}
       ></Box>
-      {!borderWidth || !borderColor ? (
+      {borderWidth && borderColor ? (
         <Box
           sx={{
             position: "absolute",
@@ -148,14 +149,16 @@ const Triangle = ({
 };
 const DieDisplay = ({ die }: { die: die }) => {
   return (
-    <Box
+    <Grid
       sx={{
         position: "relative",
         width: 100,
         height: (100 * Math.sqrt(3)) / 2,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Typography variant="h4">{die}</Typography>
       <Box
         sx={{
           position: "absolute",
@@ -164,22 +167,61 @@ const DieDisplay = ({ die }: { die: die }) => {
           left: 0,
         }}
       >
-        <Triangle size={100} color={taColors.agencyRed} />
+        <Triangle
+          size={100}
+          color={die === 3 ? taColors.agencyRed : taColors.agencyGray}
+          borderWidth={5}
+          borderColor={die === 3 ? undefined : taColors.agencyRed}
+        />
       </Box>
-    </Box>
+      <Typography sx={{ zIndex: 2 }} variant="h4">
+        {die}
+      </Typography>
+    </Grid>
   );
 };
 
 const DiceRoller = () => {
   const [dice, setDice] = React.useState(rawRollDice());
+  const [rolling, setRolling] = React.useState(false);
+  const [modified, setModified] = React.useState(false);
+  const successes = dice.filter((f) => f === 3).length;
   return (
     <Paper>
-      <Button variant="contained" onClick={() => setDice(rawRollDice)}>
+      <Button
+        disabled={rolling}
+        variant="contained"
+        onClick={() => {
+          setModified(false);
+          setDice(rawRollDice);
+          setRolling(true);
+          const intervals = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+            (v) => Math.exp(v / 3) * 60,
+          );
+          for (const index of intervals) {
+            setTimeout(() => setDice(rawRollDice()), index);
+          }
+          setTimeout(() => setRolling(false), intervals.at(-1));
+        }}
+      >
         Roll!
       </Button>
-      {dice.map((d) => (
-        <DieDisplay key={Math.random()} die={d}></DieDisplay>
-      ))}
+      <Grid container>
+        {dice.map((d) => (
+          <DieDisplay key={Math.random()} die={d}></DieDisplay>
+        ))}
+      </Grid>
+      {successes}
+      <Box sx={{ width: 500 }}>
+        {
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            alt={"RULESREF"}
+            src={"/TARulesReference.jpg"}
+            style={{ objectFit: "contain", width: "100%" }}
+          />
+        }
+      </Box>
     </Paper>
   );
 };
