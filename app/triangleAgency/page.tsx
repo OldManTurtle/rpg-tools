@@ -106,18 +106,44 @@ const Triangle = ({
   size: number;
   borderWidth: number;
   color: Property.BorderColor;
-  borderColor: Property.BorderColor;
+  borderColor?: Property.BorderColor;
 }) => {
+  const borderSize = size - 2 * borderWidth;
   return (
     <Box
       sx={{
-        width: 0,
-        height: 0,
-        borderLeft: `${size / 2}px solid transparent`,
-        borderRight: `${size / 2}px solid transparent`,
-        borderBottom: `${(size / 2) * Math.sqrt(3)}px solid ` + color,
+        position: "relative",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: (size * Math.sqrt(3)) / 2,
+        width: size,
       }}
-    />
+    >
+      <Box
+        sx={{
+          width: 0,
+          height: 0,
+          borderLeft: `${size / 2}px solid transparent`,
+          borderRight: `${size / 2}px solid transparent`,
+          borderBottom:
+            `${(size / 2) * Math.sqrt(3)}px solid ` + (borderColor ?? color),
+        }}
+      ></Box>
+      {!borderWidth || !borderColor ? (
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: borderWidth / 2,
+            width: 0,
+            height: 0,
+            borderLeft: `${borderSize / 2}px solid transparent`,
+            borderRight: `${borderSize / 2}px solid transparent`,
+            borderBottom: `${(borderSize / 2) * Math.sqrt(3)}px solid ` + color,
+          }}
+        ></Box>
+      ) : undefined}
+    </Box>
   );
 };
 const DieDisplay = ({ die }: { die: die }) => {
@@ -129,7 +155,7 @@ const DieDisplay = ({ die }: { die: die }) => {
         height: (100 * Math.sqrt(3)) / 2,
       }}
     >
-      {die}
+      <Typography variant="h4">{die}</Typography>
       <Box
         sx={{
           position: "absolute",
