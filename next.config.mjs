@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",
   experimental: {
     serverActions: {
       bodySizeLimit: "8gb",
@@ -9,6 +8,14 @@ const nextConfig = {
   images: {
     loader: "custom",
     loaderFile: "./my-loader.ts",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
