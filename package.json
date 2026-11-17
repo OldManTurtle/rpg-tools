@@ -21,6 +21,7 @@
     "react": "^19.2.6",
     "react-colorful": "^5.6.1",
     "react-dom": "^19.2.6",
+    "recharts": "^2.15.1",
     "swr": "^2.4.1",
     "usehooks-ts": "^3.1.1"
   },
