@@ -252,6 +252,7 @@ const DiceRoller = () => {
           alt={"burnout"}
           style={{
             width: 30,
+            height: "auto",
             opacity: burnout === 0 ? disabledOpacity : undefined,
           }}
         />
@@ -313,7 +314,11 @@ const DiceRoller = () => {
         <Image
           alt={"success"}
           src={success ? successSvg : failureSvg}
-          style={{ width: 40 }}
+          style={{
+            width: 40,
+
+            height: "auto",
+          }}
         />
         <Typography
           variant={"h5"}
@@ -343,6 +348,7 @@ const DiceRoller = () => {
           src={chaosSvg}
           alt={"burnout"}
           style={{
+            height: "auto",
             width: 30,
             opacity: chaos === 0 ? disabledOpacity : undefined,
           }}
@@ -365,7 +371,7 @@ const DiceRoller = () => {
             alt={"RULESREF"}
             src={triscendenceJpg}
             style={{
-              objectFit: "contain",
+              height: "auto",
               width: "500px",
               mixBlendMode: "darken",
             }}
