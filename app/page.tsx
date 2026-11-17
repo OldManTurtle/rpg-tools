@@ -21,6 +21,9 @@ export default function Home() {
         <ListItem>
           <Link href="/fileshare">File Sharing</Link>
         </ListItem>
+        <ListItem>
+          <Link href="/triangleAgency">Triangle Agency</Link>
+        </ListItem>
       </List>
     </div>
   );
