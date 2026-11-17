@@ -190,7 +190,7 @@ const DieDisplay = ({ die }: { die: die }) => {
 };
 
 const DiceRoller = () => {
-  const [dice, setDice] = React.useState(rawRollDice());
+  const [dice, setDice] = React.useState([1, 1, 1, 1, 1, 1]);
   const [rolling, setRolling] = React.useState(false);
   const [modified, setModified] = React.useState(false);
   const successes = dice.filter((f) => f === 3).length;
@@ -211,9 +211,12 @@ const DiceRoller = () => {
           <Button onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
             -Burnout
           </Button>
-          {burnout < 5 && Array.from({ length: burnout }).map(() => bo)}
-          {burnout >= 5 && bo}
-          {burnout >= 5 && <Typography>x{burnout}</Typography>}
+          {
+            <Typography variant="h5" color="primary" fontWeight={"bold"}>
+              {burnout}
+            </Typography>
+          }
+          {bo}
         </Stack>
         <Button
           disabled={rolling}
@@ -247,7 +250,7 @@ const DiceRoller = () => {
             </ButtonBase>
           ))}
         </Grid>
-        <Box>
+        <Stack alignItems={"center"}>
           {triscendence && (
             <Typography
               variant="h3"
@@ -267,7 +270,7 @@ const DiceRoller = () => {
               }}
             />
           )}
-        </Box>
+        </Stack>
         <Stack direction="row" sx={{ alignItems: "center" }}>
           <img
             alt={"success"}
