@@ -13,15 +13,6 @@ export default function Home() {
           <Link href="/clocks">Clocks</Link>
         </ListItem>
         <ListItem>
-          <Link href="/cube">Rubik&apos;s Cube</Link>
-        </ListItem>
-        <ListItem>
-          <Link href="/mtgcube">Mtg Cube</Link>
-        </ListItem>
-        <ListItem>
-          <Link href="/fileshare">File Sharing</Link>
-        </ListItem>
-        <ListItem>
           <Link href="/triangleAgency">Triangle Agency</Link>
         </ListItem>
       </List>
