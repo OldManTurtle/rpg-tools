@@ -7,14 +7,8 @@ const nextConfig = {
     },
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "cards.scryfall.io",
-        port: "",
-        pathname: "/**",
-      },
-    ],
+    loader: "custom",
+    loaderFile: "./my-loader.ts",
   },
 };
 
