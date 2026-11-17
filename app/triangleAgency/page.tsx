@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { Button, Container, Grid, Paper, Typography } from "@mui/material";
 
@@ -174,7 +175,14 @@ const DieDisplay = ({ die }: { die: die }) => {
           borderColor={die === 3 ? undefined : taColors.agencyRed}
         />
       </Box>
-      <Typography sx={{ zIndex: 2 }} variant="h4">
+      <Typography
+        sx={{
+          zIndex: 2,
+          color: (t) =>
+            die === 3 ? t.palette.primary.contrastText : t.palette.primary.main,
+        }}
+        variant="h4"
+      >
         {die}
       </Typography>
     </Grid>
@@ -185,7 +193,10 @@ const DiceRoller = () => {
   const [dice, setDice] = React.useState(rawRollDice());
   const [rolling, setRolling] = React.useState(false);
   const [modified, setModified] = React.useState(false);
-  const successes = dice.filter((f) => f === 3).length;
+  const successes = 3; //dice.filter((f) => f === 3).length;
+  const [burnout, setBurnout] = React.useState(0);
+  const chaos = successes === 3 ? 0 : 6 - successes + burnout;
+  const success = successes === 3 ? true : successes - burnout > 0;
   return (
     <Paper>
       <Button
@@ -206,21 +217,50 @@ const DiceRoller = () => {
       >
         Roll!
       </Button>
+      <Button onClick={() => setBurnout((b) => b + 1)}>+Burnout</Button>
+      <Button onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
+        -Burnout
+      </Button>
+
+      <Typography variant={"h5"} sx={{ color: "primary" }}>
+        <img src={"/burnout.svg"} alt={"burnout"} style={{ width: 30 }} />
+        {burnout}
+      </Typography>
       <Grid container>
         {dice.map((d) => (
           <DieDisplay key={Math.random()} die={d}></DieDisplay>
         ))}
       </Grid>
-      {successes}
+      <Typography>
+        {successes}-{burnout}
+      </Typography>
+      {successes === 3 && !modified && !rolling && (
+        <Typography
+          variant="h3"
+          sx={{ color: (t) => t.palette.primary.main, fontWeight: "bold" }}
+        >
+          Triscendence!
+        </Typography>
+      )}
+      {successes === 3 && !modified && !rolling && (
+        <img
+          alt={"RULESREF"}
+          src={"/triscendence.jpg"}
+          style={{ objectFit: "contain", width: "500px" }}
+        />
+      )}
+      <img
+        alt={"success"}
+        src={success ? "/ability - success.svg" : "/ability - failure.svg"}
+        style={{ width: 40 }}
+      />
+      <Typography>{success ? "Success" : "Failure"}</Typography>
       <Box sx={{ width: 500 }}>
-        {
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt={"RULESREF"}
-            src={"/TARulesReference.jpg"}
-            style={{ objectFit: "contain", width: "100%" }}
-          />
-        }
+        <img
+          alt={"RULESREF"}
+          src={"/TARulesReference.jpg"}
+          style={{ objectFit: "contain", width: "100%" }}
+        />
       </Box>
     </Paper>
   );
@@ -243,10 +283,10 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Typography variant="h1">Triangle Agency</Typography>
-            <DiceRoller />
-          </Container>
+          {/* <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}> */}
+          {/* <Typography variant="h1">Triangle Agency</Typography> */}
+          <DiceRoller />
+          {/* </Container> */}
         </Box>
       </Box>
     </ThemeProvider>
