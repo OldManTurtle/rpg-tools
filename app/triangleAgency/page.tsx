@@ -418,7 +418,7 @@ export default function Dashboard() {
               <Image
                 alt={"RULESREF"}
                 src={rulesReferenceJpg}
-                style={{ objectFit: "contain", width: "100%" }}
+                style={{ objectFit: "contain", width: "100%", height: "auto" }}
               />
             </Grid>
           </Grid>
