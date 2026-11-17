@@ -1,25 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import {
-  Button,
-  ButtonBase,
-  Container,
-  Grid,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Button, ButtonBase, Grid, Paper, Typography } from "@mui/material";
 
 import * as React from "react";
-import {
-  createTheme,
-  SxProps,
-  Theme,
-  ThemeProvider,
-} from "@mui/material/styles";
-import Image from "next/image";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import { Property } from "csstype";
 
 const taColors = {
@@ -260,7 +246,11 @@ const DiceRoller = () => {
           <img
             alt={"RULESREF"}
             src={"/triscendence.jpg"}
-            style={{ objectFit: "contain", width: "500px" }}
+            style={{
+              objectFit: "contain",
+              width: "500px",
+              mixBlendMode: "darken",
+            }}
           />
         )}
       </Box>
@@ -274,13 +264,6 @@ const DiceRoller = () => {
       </Box>
       <Box>
         <img alt={"success"} src={"/chaos.svg"} style={{ width: 40 }} />x{chaos}
-      </Box>
-      <Box sx={{ width: 100 }}>
-        <img
-          alt={"RULESREF"}
-          src={"/TARulesReference.jpg"}
-          style={{ objectFit: "contain", width: "100%" }}
-        />
       </Box>
     </Paper>
   );
@@ -302,7 +285,18 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          <DiceRoller />
+          <Grid container>
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <DiceRoller />
+            </Grid>
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <img
+                alt={"RULESREF"}
+                src={"/TARulesReference.jpg"}
+                style={{ objectFit: "contain", width: "100%" }}
+              />
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </ThemeProvider>
