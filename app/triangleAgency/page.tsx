@@ -2,10 +2,16 @@
 import { Button, Container, Paper, Typography } from "@mui/material";
 
 import * as React from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {
+  createTheme,
+  SxProps,
+  Theme,
+  ThemeProvider,
+} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
+import { Property } from "csstype";
 
 const taColors = {
   agencyRed: "#d10017",
@@ -91,12 +97,63 @@ const rawRollDice = () =>
     rawRollDie(),
   ] as dice;
 
+const Triangle = ({
+  size,
+  color,
+  borderWidth,
+  borderColor,
+}: {
+  size: number;
+  borderWidth: number;
+  color: Property.BorderColor;
+  borderColor: Property.BorderColor;
+}) => {
+  return (
+    <Box
+      sx={{
+        width: 0,
+        height: 0,
+        borderLeft: `${size / 2}px solid transparent`,
+        borderRight: `${size / 2}px solid transparent`,
+        borderBottom: `${(size / 2) * Math.sqrt(3)}px solid ` + color,
+      }}
+    />
+  );
+};
+const DieDisplay = ({ die }: { die: die }) => {
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        width: 100,
+        height: (100 * Math.sqrt(3)) / 2,
+      }}
+    >
+      {die}
+      <Box
+        sx={{
+          position: "absolute",
+          minWidth: 100,
+          top: 0,
+          left: 0,
+        }}
+      >
+        <Triangle size={100} color={taColors.agencyRed} />
+      </Box>
+    </Box>
+  );
+};
+
 const DiceRoller = () => {
   const [dice, setDice] = React.useState(rawRollDice());
   return (
     <Paper>
-      <Button onClick={() => setDice(rawRollDice)}>Roll!</Button>
-      {dice}
+      <Button variant="contained" onClick={() => setDice(rawRollDice)}>
+        Roll!
+      </Button>
+      {dice.map((d) => (
+        <DieDisplay key={Math.random()} die={d}></DieDisplay>
+      ))}
     </Paper>
   );
 };
@@ -120,9 +177,6 @@ export default function Dashboard() {
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h1">Triangle Agency</Typography>
-            <Button variant="contained" color="primary">
-              PRIMARY
-            </Button>
             <DiceRoller />
           </Container>
         </Box>
