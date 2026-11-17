@@ -4,11 +4,12 @@ import {
   Button,
   ButtonBase,
   Grid,
+  IconButton,
   Paper,
   Stack,
   Typography,
 } from "@mui/material";
-
+import * as Icons from "@mui/icons-material";
 import * as React from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -149,12 +150,13 @@ const Triangle = ({
   );
 };
 const DieDisplay = ({ die }: { die: die }) => {
+  const size = 70;
   return (
     <Grid
       sx={{
         position: "relative",
-        width: 100,
-        height: (100 * Math.sqrt(3)) / 2,
+        width: size,
+        height: (size * Math.sqrt(3)) / 2,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -163,13 +165,13 @@ const DieDisplay = ({ die }: { die: die }) => {
       <Box
         sx={{
           position: "absolute",
-          minWidth: 100,
+          minWidth: size,
           top: 0,
           left: 0,
         }}
       >
         <Triangle
-          size={100}
+          size={size}
           color={die === 3 ? taColors.agencyRed : taColors.agencyGray}
           borderWidth={5}
           borderColor={die === 3 ? undefined : taColors.agencyRed}
@@ -177,11 +179,13 @@ const DieDisplay = ({ die }: { die: die }) => {
       </Box>
       <Typography
         sx={{
+          fontWeight: "bold",
+          paddingTop: 2,
           zIndex: 2,
           color: (t) =>
             die === 3 ? t.palette.primary.contrastText : t.palette.primary.main,
         }}
-        variant="h4"
+        variant="h5"
       >
         {die}
       </Typography>
@@ -198,91 +202,147 @@ const DiceRoller = () => {
   const triscendence = successes === 3 && !modified && !rolling;
   const success = successes === 3 ? true : successes - burnout > 0;
   const chaos = Math.max(0, successes === 3 ? 0 : 6 - successes + burnout);
-  const bo = <img src={"/burnout.svg"} alt={"burnout"} style={{ width: 30 }} />;
-  return (
-    <Paper sx={{ padding: 1, height: "100%", width: "100%" }}>
-      <Stack spacing={1}>
-        <Stack
-          direction="row"
-          sx={{ alignItems: "center", padding: 1 }}
-          spacing={1}
-        >
-          <Button onClick={() => setBurnout((b) => b + 1)}>+Burnout</Button>
-          <Button onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
-            -Burnout
-          </Button>
-          {
-            <Typography variant="h5" color="primary" fontWeight={"bold"}>
-              {burnout}
-            </Typography>
-          }
-          {bo}
-        </Stack>
-        <Button
-          disabled={rolling}
-          variant="contained"
-          onClick={() => {
-            setModified(false);
-            setDice(rawRollDice);
-            setRolling(true);
-            const intervals = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-              (v) => Math.exp(v / 3) * 60,
-            );
-            for (const index of intervals) {
-              setTimeout(() => setDice(rawRollDice()), index);
-            }
-            setTimeout(() => setRolling(false), intervals.at(-1));
+  const boZone = (
+    <Stack>
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center", padding: 1 }}
+        spacing={1}
+      ></Stack>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: "center",
+          padding: 1,
+          width: "100%",
+          justifyContent: "center",
+        }}
+        spacing={1}
+      >
+        <IconButton onClick={() => setBurnout((b) => b + 1)}>
+          <Icons.Add />
+        </IconButton>
+
+        <Typography
+          variant="h5"
+          fontWeight={"bold"}
+          sx={{
+            color: (t) =>
+              burnout === 0
+                ? t.palette.action.disabled
+                : t.palette.primary.main,
+            width: 15,
           }}
         >
-          Roll!
-        </Button>
-        <Grid container justifyContent={"center"}>
-          {dice.map((d, index) => (
-            <ButtonBase
-              key={Math.random()}
-              onClick={() => {
-                dice[index] = Math.max(1, (d + 1) % 5) as die;
-                setDice([...dice]);
-                setModified(true);
-              }}
-            >
-              <DieDisplay die={d}></DieDisplay>
-            </ButtonBase>
-          ))}
-        </Grid>
-        <Stack alignItems={"center"}>
-          {triscendence && (
-            <Typography
-              variant="h3"
-              sx={{ color: (t) => t.palette.primary.main, fontWeight: "bold" }}
-            >
-              Triscendence!
-            </Typography>
-          )}
-          {triscendence && (
-            <img
-              alt={"RULESREF"}
-              src={"/triscendence.jpg"}
-              style={{
-                objectFit: "contain",
-                width: "500px",
-                mixBlendMode: "darken",
-              }}
-            />
-          )}
-        </Stack>
-        <Stack direction="row" sx={{ alignItems: "center" }}>
+          {burnout}
+        </Typography>
+
+        <img src={"/burnout.svg"} alt={"burnout"} style={{ width: 30 }} />
+        <IconButton onClick={() => setBurnout((b) => Math.max(0, b - 1))}>
+          <Icons.Remove />
+        </IconButton>
+      </Stack>
+    </Stack>
+  );
+  const rollZone = (
+    <Stack
+      sx={{
+        flex: 1,
+      }}
+      spacing={1}
+    >
+      <Button
+        sx={{ width: "100%" }}
+        disabled={rolling}
+        variant="contained"
+        onClick={() => {
+          setModified(false);
+          setDice(rawRollDice);
+          setRolling(true);
+          const intervals = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+            (v) => Math.exp(v / 3) * 60,
+          );
+          for (const index of intervals) {
+            setTimeout(() => setDice(rawRollDice()), index);
+          }
+          setTimeout(() => setRolling(false), intervals.at(-1));
+        }}
+      >
+        Roll!
+      </Button>
+      <Stack
+        spacing={1}
+        sx={{ width: "100%", justifyContent: "center" }}
+        direction="row"
+      >
+        {dice.map((d, index) => (
+          <ButtonBase
+            key={Math.random()}
+            onClick={() => {
+              dice[index] = Math.max(1, (d + 1) % 5) as die;
+              setDice([...dice]);
+              setModified(true);
+            }}
+          >
+            <DieDisplay die={d}></DieDisplay>
+          </ButtonBase>
+        ))}
+      </Stack>
+    </Stack>
+  );
+  const results = (
+    <Stack>
+      <Stack alignItems={"center"}>
+        {triscendence && (
+          <Typography
+            variant="h3"
+            sx={{
+              color: (t) => t.palette.primary.main,
+              fontWeight: "bold",
+            }}
+          >
+            Triscendence!
+          </Typography>
+        )}
+        {triscendence && (
           <img
-            alt={"success"}
-            src={success ? "/ability - success.svg" : "/ability - failure.svg"}
-            style={{ width: 40 }}
+            alt={"RULESREF"}
+            src={"/triscendence.jpg"}
+            style={{
+              objectFit: "contain",
+              width: "500px",
+              mixBlendMode: "darken",
+            }}
           />
-          {success ? "Success" : "Failure"}
+        )}
+      </Stack>
+      <Stack direction="row" sx={{ alignItems: "center" }}>
+        <img
+          alt={"success"}
+          src={success ? "/ability - success.svg" : "/ability - failure.svg"}
+          style={{ width: 40 }}
+        />
+        {success ? "Success" : "Failure"}
+      </Stack>
+      <Stack direction="row" sx={{ alignItems: "center" }}>
+        <img alt={"success"} src={"/chaos.svg"} style={{ width: 40 }} />x{chaos}
+      </Stack>
+    </Stack>
+  );
+  return (
+    <Paper sx={{ padding: 1, height: "100%", width: "100%" }}>
+      <Stack
+        spacing={1}
+        sx={{
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <Stack direction="row">
+          {rollZone}
+          {boZone}
         </Stack>
-        <Stack direction="row" sx={{ alignItems: "center" }}>
-          <img alt={"success"} src={"/chaos.svg"} style={{ width: 40 }} />x
-          {chaos}
-        </Stack>
+        {results}
       </Stack>
     </Paper>
   );
