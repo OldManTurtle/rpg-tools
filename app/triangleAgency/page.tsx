@@ -392,7 +392,7 @@ const DiceRoller = () => {
           {boZone}
         </Stack>
         <Divider />
-        {results}
+        {rolling ? undefined : results}
       </Stack>
     </Paper>
   );
