@@ -209,7 +209,7 @@ const DiceRoller = () => {
   const [modified, setModified] = React.useState(false);
   const successes = dice.filter((f) => f === 3).length;
   const [burnout, setBurnout] = React.useState(0);
-  const triscendence = successes === 3 && !modified && !rolling;
+  const triscendence = successes === 3 && !modified;
   const t = useTheme();
   const disabledOpacity = t.palette.action.disabledOpacity;
   const success = successes === 3 ? true : successes - burnout > 0;
