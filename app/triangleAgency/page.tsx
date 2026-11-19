@@ -3,7 +3,6 @@ import {
   Button,
   ButtonBase,
   Container,
-  Dialog,
   Divider,
   Grid,
   IconButton,
@@ -18,8 +17,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import { Property } from "csstype";
 import Image from "next/image";
-import rulesReferenceJpg from "../../public/TARulesReference.jpg";
-import askAgencyJpg from "../../public/AskAgencyReference.jpg";
 import burnoutSvg from "../../public/burnout.svg";
 import successSvg from "../../public/ability - success.svg";
 import failureSvg from "../../public/ability - failure.svg";
