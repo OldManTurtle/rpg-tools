@@ -2,6 +2,8 @@
 import {
   Button,
   ButtonBase,
+  Container,
+  Dialog,
   Divider,
   Grid,
   IconButton,
@@ -17,6 +19,7 @@ import Box from "@mui/material/Box";
 import { Property } from "csstype";
 import Image from "next/image";
 import rulesReferenceJpg from "../../public/TARulesReference.jpg";
+import askAgencyJpg from "../../public/AskAgencyReference.jpg";
 import burnoutSvg from "../../public/burnout.svg";
 import successSvg from "../../public/ability - success.svg";
 import failureSvg from "../../public/ability - failure.svg";
@@ -395,6 +398,8 @@ const DiceRoller = () => {
   );
 };
 export default function Dashboard() {
+  const [rollPopover, setRollPopover] = React.useState(false);
+  const [askPopover, setAskPopover] = React.useState(false);
   return (
     <ThemeProvider theme={triangleTheme}>
       <Box sx={{ display: "flex" }}>
@@ -411,18 +416,64 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          <Grid container>
-            <Grid size={{ xs: 12, lg: 7, xl: 6 }} sx={{ padding: 1 }}>
-              <DiceRoller />
+          <Container maxWidth="lg">
+            <Grid container>
+              <Grid size={{ xs: 12, md: 10 }} sx={{ padding: 1 }}>
+                <DiceRoller />
+              </Grid>
+
+              <Grid size={{ xs: 12, md: 2 }}>
+                <Stack spacing={1} sx={{ padding: 1 }}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => setRollPopover(true)}
+                  >
+                    Rolling Rules
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    onClick={() => setAskPopover(true)}
+                  >
+                    Ask the Agency
+                  </Button>
+                </Stack>
+              </Grid>
+              <Dialog
+                open={rollPopover}
+                fullWidth
+                maxWidth="lg"
+                onClose={() => setRollPopover(false)}
+              >
+                <Image
+                  alt={"RULESREF"}
+                  src={rulesReferenceJpg}
+                  style={{
+                    objectFit: "contain",
+                    width: "100%",
+                    height: "auto",
+                  }}
+                />
+              </Dialog>
+              <Dialog
+                open={askPopover}
+                fullWidth
+                maxWidth="lg"
+                onClose={() => setAskPopover(false)}
+              >
+                <Image
+                  alt={"RULESREF"}
+                  src={askAgencyJpg}
+                  style={{
+                    objectFit: "contain",
+                    width: "100%",
+                    height: "auto",
+                  }}
+                />
+              </Dialog>
             </Grid>
-            <Grid size={{ xs: 12, lg: 5, xl: 6 }}>
-              <Image
-                alt={"RULESREF"}
-                src={rulesReferenceJpg}
-                style={{ objectFit: "contain", width: "100%", height: "auto" }}
-              />
-            </Grid>
-          </Grid>
+          </Container>
         </Box>
       </Box>
     </ThemeProvider>
