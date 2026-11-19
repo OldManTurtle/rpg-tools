@@ -396,8 +396,6 @@ const DiceRoller = () => {
   );
 };
 export default function Dashboard() {
-  const [rollPopover, setRollPopover] = React.useState(false);
-  const [askPopover, setAskPopover] = React.useState(false);
   return (
     <ThemeProvider theme={triangleTheme}>
       <Box sx={{ display: "flex" }}>
@@ -415,62 +413,7 @@ export default function Dashboard() {
           }}
         >
           <Container maxWidth="lg">
-            <Grid container>
-              <Grid size={{ xs: 12, md: 10 }} sx={{ padding: 1 }}>
-                <DiceRoller />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 2 }}>
-                <Stack spacing={1} sx={{ padding: 1 }}>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    onClick={() => setRollPopover(true)}
-                  >
-                    Rolling Rules
-                  </Button>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    onClick={() => setAskPopover(true)}
-                  >
-                    Ask the Agency
-                  </Button>
-                </Stack>
-              </Grid>
-              <Dialog
-                open={rollPopover}
-                fullWidth
-                maxWidth="lg"
-                onClose={() => setRollPopover(false)}
-              >
-                <Image
-                  alt={"RULESREF"}
-                  src={rulesReferenceJpg}
-                  style={{
-                    objectFit: "contain",
-                    width: "100%",
-                    height: "auto",
-                  }}
-                />
-              </Dialog>
-              <Dialog
-                open={askPopover}
-                fullWidth
-                maxWidth="lg"
-                onClose={() => setAskPopover(false)}
-              >
-                <Image
-                  alt={"RULESREF"}
-                  src={askAgencyJpg}
-                  style={{
-                    objectFit: "contain",
-                    width: "100%",
-                    height: "auto",
-                  }}
-                />
-              </Dialog>
-            </Grid>
+            <DiceRoller />
           </Container>
         </Box>
       </Box>
