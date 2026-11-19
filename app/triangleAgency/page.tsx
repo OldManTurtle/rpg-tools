@@ -215,11 +215,6 @@ const DiceRoller = () => {
     <Stack>
       <Stack
         direction="row"
-        sx={{ alignItems: "center", padding: 1 }}
-        spacing={1}
-      ></Stack>
-      <Stack
-        direction="row"
         sx={{
           alignItems: "center",
           padding: 1,
