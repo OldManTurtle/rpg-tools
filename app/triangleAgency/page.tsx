@@ -327,7 +327,7 @@ const DiceRoller = () => {
             width: 15,
           }}
         >
-          {success ? "Success " : "Failure "}({successes - burnout})
+          {`${success ? "Success" : "Failure"} (${successes - burnout})`}
         </Typography>
         <Box sx={{ flex: 1 }} />
         <Typography
