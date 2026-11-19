@@ -324,7 +324,6 @@ const DiceRoller = () => {
           sx={{
             color: (t) =>
               success ? t.palette.info.main : t.palette.primary.main,
-            width: 15,
           }}
         >
           {`${success ? "Success" : "Failure"} (${successes - burnout})`}
@@ -336,7 +335,6 @@ const DiceRoller = () => {
           sx={{
             opacity: chaos === 0 ? disabledOpacity : undefined,
             color: (t) => t.palette.info.main,
-            width: 15,
           }}
         >
           {chaos}
